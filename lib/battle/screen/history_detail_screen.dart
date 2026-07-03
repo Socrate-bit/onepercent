@@ -117,6 +117,23 @@ class HistoryDetailScreen extends StatelessWidget {
                   ],
                 ),
               ),
+              if (battle.values.isNotEmpty) ...[
+                const SizedBox(height: 12),
+                _InfoTile(
+                  icon: Icons.favorite_rounded,
+                  label: 'VALUES',
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 2),
+                    child: Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: [
+                        for (final v in battle.values) _ValueChip(label: v),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
               const SizedBox(height: 12),
               _InfoTile(
                 icon: Icons.notes_rounded,
@@ -137,6 +154,32 @@ class HistoryDetailScreen extends StatelessWidget {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+/// A small pill for one value tagged onto the battle.
+class _ValueChip extends StatelessWidget {
+  final String label;
+  const _ValueChip({required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: AppColors.fire.withValues(alpha: 0.14),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.fire.withValues(alpha: 0.4)),
+      ),
+      child: Text(
+        label,
+        style: const TextStyle(
+          color: AppColors.fire,
+          fontSize: 13,
+          fontWeight: FontWeight.w700,
         ),
       ),
     );

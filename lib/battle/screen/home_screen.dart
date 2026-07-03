@@ -14,6 +14,7 @@ import '../../recovery/cubit/recovery_cubit.dart';
 import '../../recovery/screen/recovery_screen.dart';
 import '../../theme/app_theme.dart';
 import '../../value/cubit/value_cubit.dart';
+import '../../value/widget/add_value_dialog.dart';
 import '../cubit/battle_cubit.dart';
 import '../cubit/battle_state.dart';
 import '../models/battle.dart';
@@ -64,9 +65,22 @@ class _HomeScreenState extends State<HomeScreen> {
   /// the confetti burst. Bailing out of the dialog records nothing.
   Future<void> _record(BattleOutcome outcome) async {
     final cubit = context.read<BattleCubit>();
-    final values =
-        context.read<ValueCubit>().state.values.map((v) => v.title).toList();
-    final entry = await showDifficultyDialog(context, outcome, values: values);
+    final valueCubit = context.read<ValueCubit>();
+    final values = valueCubit.state.values.map((v) => v.title).toList();
+    final entry = await showDifficultyDialog(
+      context,
+      outcome,
+      values: values,
+      onAddValue: () async {
+        final title = await showAddValueDialog(
+          context,
+          presets: valueCubit.state.presets,
+        );
+        if (title == null) return null;
+        valueCubit.addValue(title);
+        return title;
+      },
+    );
     if (entry == null) return;
 
     if (outcome == BattleOutcome.win) {

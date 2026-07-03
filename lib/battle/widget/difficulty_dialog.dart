@@ -18,25 +18,37 @@ typedef DifficultyResult = ({
 /// Presents a modal bottom sheet asking how hard the decision felt on a 0–10
 /// scale (plus an optional decision name and value tags) before the outcome is
 /// committed. [values] are the user's ranked value titles offered as tags.
+/// [onAddValue], when provided, powers an "Add value" chip: it should create a
+/// value and return its title (or null if cancelled), which is then tagged.
 /// Returns the entry, or `null` if the user dismisses without confirming
 /// (nothing should be recorded).
 Future<DifficultyResult?> showDifficultyDialog(
   BuildContext context,
   BattleOutcome outcome, {
   List<String> values = const [],
+  Future<String?> Function()? onAddValue,
 }) {
   return showModalBottomSheet<DifficultyResult>(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
-    builder: (_) => _DifficultySheet(outcome: outcome, values: values),
+    builder: (_) => _DifficultySheet(
+      outcome: outcome,
+      values: values,
+      onAddValue: onAddValue,
+    ),
   );
 }
 
 class _DifficultySheet extends StatefulWidget {
   final BattleOutcome outcome;
   final List<String> values;
-  const _DifficultySheet({required this.outcome, required this.values});
+  final Future<String?> Function()? onAddValue;
+  const _DifficultySheet({
+    required this.outcome,
+    required this.values,
+    this.onAddValue,
+  });
 
   @override
   State<_DifficultySheet> createState() => _DifficultySheetState();
@@ -46,6 +58,9 @@ class _DifficultySheetState extends State<_DifficultySheet> {
   double _value = 5;
   final _nameController = TextEditingController();
   final Set<String> _selectedValues = {};
+
+  /// Mutable copy of the offered values so a freshly-added one shows instantly.
+  late final List<String> _values = [...widget.values];
 
   @override
   void dispose() {
@@ -65,7 +80,18 @@ class _DifficultySheetState extends State<_DifficultySheet> {
     );
   }
 
-  /// Multi-select value tags, shown only when the user has values to offer.
+  /// Opens the caller-provided add-value flow, then tags the new value.
+  Future<void> _addValue() async {
+    final added = (await widget.onAddValue?.call())?.trim();
+    if (added == null || added.isEmpty || !mounted) return;
+    setState(() {
+      if (!_values.contains(added)) _values.add(added);
+      _selectedValues.add(added);
+    });
+  }
+
+  /// Multi-select value tags. Shown when the user has values to offer or an
+  /// [onAddValue] hook is available (so an empty list still gets an add chip).
   Widget _valuePicker(Color accent) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -84,7 +110,7 @@ class _DifficultySheetState extends State<_DifficultySheet> {
           spacing: 8,
           runSpacing: 8,
           children: [
-            for (final value in widget.values)
+            for (final value in _values)
               _ValueChip(
                 label: value,
                 selected: _selectedValues.contains(value),
@@ -95,6 +121,8 @@ class _DifficultySheetState extends State<_DifficultySheet> {
                   }
                 }),
               ),
+            if (widget.onAddValue != null)
+              _AddValueChip(accent: accent, onTap: _addValue),
           ],
         ),
       ],
@@ -260,7 +288,7 @@ class _DifficultySheetState extends State<_DifficultySheet> {
                 ),
               ),
             ),
-            if (widget.values.isNotEmpty) ...[
+            if (_values.isNotEmpty || widget.onAddValue != null) ...[
               const SizedBox(height: 18),
               _valuePicker(accent),
             ],
@@ -357,6 +385,48 @@ class _ValueChip extends StatelessWidget {
                   color: selected ? accent : AppColors.textPrimary,
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// A dashed-feel "Add value" chip that opens the add-value flow. Lets users
+/// create a value on the spot when they have none (or want a new one).
+class _AddValueChip extends StatelessWidget {
+  final Color accent;
+  final VoidCallback onTap;
+  const _AddValueChip({required this.accent, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: accent.withValues(alpha: 0.10),
+      borderRadius: BorderRadius.circular(20),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(20),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: accent.withValues(alpha: 0.5)),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.add_rounded, size: 16, color: accent),
+              const SizedBox(width: 6),
+              Text(
+                'Add value',
+                style: TextStyle(
+                  color: accent,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
             ],

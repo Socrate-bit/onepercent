@@ -18,8 +18,16 @@ Color difficultyColor(num difficulty) {
 
 /// The "History" tab: a reverse-chronological list of every battle, each row
 /// showing the outcome (win/loss), how hard it felt, and when it happened.
-class HistoryScreen extends StatelessWidget {
+class HistoryScreen extends StatefulWidget {
   const HistoryScreen({super.key});
+
+  @override
+  State<HistoryScreen> createState() => _HistoryScreenState();
+}
+
+class _HistoryScreenState extends State<HistoryScreen> {
+  /// When true, list is ordered hardest-first instead of newest-first.
+  bool _sortByDifficulty = false;
 
   @override
   Widget build(BuildContext context) {
@@ -29,10 +37,14 @@ class HistoryScreen extends StatelessWidget {
         builder: (context, state) {
           // Newest first — battles are stored oldest-first.
           final battles = state.battles.reversed.toList();
+          if (_sortByDifficulty) {
+            // Hardest first; newest breaks ties (list is already newest-first).
+            battles.sort((a, b) => b.difficulty.compareTo(a.difficulty));
+          }
           return CustomScrollView(
             slivers: [
               const SliverPadding(
-                padding: EdgeInsets.fromLTRB(20, 8, 20, 16),
+                padding: EdgeInsets.fromLTRB(20, 8, 20, 12),
                 sliver: SliverToBoxAdapter(
                   child: Center(
                     child: Text(
@@ -47,6 +59,20 @@ class HistoryScreen extends StatelessWidget {
                   ),
                 ),
               ),
+              if (battles.isNotEmpty)
+                SliverPadding(
+                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
+                  sliver: SliverToBoxAdapter(
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: _SortToggle(
+                        sortByDifficulty: _sortByDifficulty,
+                        onChanged: (v) =>
+                            setState(() => _sortByDifficulty = v),
+                      ),
+                    ),
+                  ),
+                ),
               if (state.loading && battles.isEmpty)
                 const SliverFillRemaining(
                   hasScrollBody: false,
@@ -69,6 +95,54 @@ class HistoryScreen extends StatelessWidget {
             ],
           );
         },
+      ),
+    );
+  }
+}
+
+/// A pill toggle switching the list between newest-first and hardest-first.
+class _SortToggle extends StatelessWidget {
+  final bool sortByDifficulty;
+  final ValueChanged<bool> onChanged;
+  const _SortToggle({required this.sortByDifficulty, required this.onChanged});
+
+  @override
+  Widget build(BuildContext context) {
+    final accent = sortByDifficulty ? AppColors.fire : AppColors.textSecondary;
+    return Material(
+      color: sortByDifficulty
+          ? AppColors.fire.withValues(alpha: 0.14)
+          : AppColors.card,
+      borderRadius: BorderRadius.circular(20),
+      child: InkWell(
+        onTap: () => onChanged(!sortByDifficulty),
+        borderRadius: BorderRadius.circular(20),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: sortByDifficulty
+                  ? AppColors.fire.withValues(alpha: 0.4)
+                  : AppColors.cardBorder,
+            ),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.whatshot_rounded, color: accent, size: 15),
+              const SizedBox(width: 6),
+              Text(
+                sortByDifficulty ? 'Most difficult' : 'Sort by difficulty',
+                style: TextStyle(
+                  color: accent,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
