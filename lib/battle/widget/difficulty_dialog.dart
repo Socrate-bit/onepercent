@@ -4,34 +4,39 @@ import '../../theme/app_theme.dart';
 import '../models/battle.dart';
 
 /// The outcome of the difficulty sheet: how hard it felt, an optional name
-/// describing the decision, whether the user asked to breathe afterwards, and
-/// whether they want to jump straight into Recovery mode.
+/// describing the decision, the personal values tagged onto it, whether the
+/// user asked to breathe afterwards, and whether they want to jump straight
+/// into Recovery mode.
 typedef DifficultyResult = ({
   int difficulty,
   String name,
+  List<String> values,
   bool breathe,
   bool recover,
 });
 
 /// Presents a modal bottom sheet asking how hard the decision felt on a 0–10
-/// scale (plus an optional decision name) before the outcome is committed.
+/// scale (plus an optional decision name and value tags) before the outcome is
+/// committed. [values] are the user's ranked value titles offered as tags.
 /// Returns the entry, or `null` if the user dismisses without confirming
 /// (nothing should be recorded).
 Future<DifficultyResult?> showDifficultyDialog(
   BuildContext context,
-  BattleOutcome outcome,
-) {
+  BattleOutcome outcome, {
+  List<String> values = const [],
+}) {
   return showModalBottomSheet<DifficultyResult>(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
-    builder: (_) => _DifficultySheet(outcome: outcome),
+    builder: (_) => _DifficultySheet(outcome: outcome, values: values),
   );
 }
 
 class _DifficultySheet extends StatefulWidget {
   final BattleOutcome outcome;
-  const _DifficultySheet({required this.outcome});
+  final List<String> values;
+  const _DifficultySheet({required this.outcome, required this.values});
 
   @override
   State<_DifficultySheet> createState() => _DifficultySheetState();
@@ -40,6 +45,7 @@ class _DifficultySheet extends StatefulWidget {
 class _DifficultySheetState extends State<_DifficultySheet> {
   double _value = 5;
   final _nameController = TextEditingController();
+  final Set<String> _selectedValues = {};
 
   @override
   void dispose() {
@@ -52,9 +58,46 @@ class _DifficultySheetState extends State<_DifficultySheet> {
       (
         difficulty: _value.round(),
         name: _nameController.text.trim(),
+        values: _selectedValues.toList(),
         breathe: breathe,
         recover: recover,
       ),
+    );
+  }
+
+  /// Multi-select value tags, shown only when the user has values to offer.
+  Widget _valuePicker(Color accent) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'TAG YOUR VALUES (optional)',
+          style: TextStyle(
+            color: AppColors.textSecondary,
+            fontSize: 11,
+            fontWeight: FontWeight.w800,
+            letterSpacing: 1.5,
+          ),
+        ),
+        const SizedBox(height: 10),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            for (final value in widget.values)
+              _ValueChip(
+                label: value,
+                selected: _selectedValues.contains(value),
+                accent: accent,
+                onTap: () => setState(() {
+                  if (!_selectedValues.remove(value)) {
+                    _selectedValues.add(value);
+                  }
+                }),
+              ),
+          ],
+        ),
+      ],
     );
   }
 
@@ -217,6 +260,10 @@ class _DifficultySheetState extends State<_DifficultySheet> {
                 ),
               ),
             ),
+            if (widget.values.isNotEmpty) ...[
+              const SizedBox(height: 18),
+              _valuePicker(accent),
+            ],
             if (!isWin) ...[
               const SizedBox(height: 20),
               _reflection(accent),
@@ -257,6 +304,63 @@ class _DifficultySheetState extends State<_DifficultySheet> {
               ],
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+/// A toggleable value tag. Filled with the outcome accent when selected,
+/// otherwise a plain outlined chip.
+class _ValueChip extends StatelessWidget {
+  final String label;
+  final bool selected;
+  final Color accent;
+  final VoidCallback onTap;
+  const _ValueChip({
+    required this.label,
+    required this.selected,
+    required this.accent,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: selected ? accent.withValues(alpha: 0.18) : AppColors.background,
+      borderRadius: BorderRadius.circular(20),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(20),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: selected ? accent : AppColors.cardBorder,
+            ),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                selected
+                    ? Icons.check_circle_rounded
+                    : Icons.add_circle_outline_rounded,
+                size: 16,
+                color: selected ? accent : AppColors.textSecondary,
+              ),
+              const SizedBox(width: 6),
+              Text(
+                label,
+                style: TextStyle(
+                  color: selected ? accent : AppColors.textPrimary,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

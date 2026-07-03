@@ -21,14 +21,15 @@ class BattleService {
         );
   }
 
-  /// Records a new battle with the given [outcome], [difficulty] (0–10), and
-  /// an optional [name] describing the decision.
+  /// Records a new battle with the given [outcome], [difficulty] (0–10), an
+  /// optional [name] describing the decision, and optional tagged [values].
   Future<void> addBattle(
     String uid,
     BattleOutcome outcome, {
     int difficulty = 0,
     String name = '',
     BattleSource source = BattleSource.normal,
+    List<String> values = const [],
   }) async {
     try {
       final battle = Battle(
@@ -38,6 +39,7 @@ class BattleService {
         difficulty: difficulty,
         name: name,
         source: source,
+        values: values,
       );
       await _battles(uid).add(battle.toMap());
       debugPrint('[BattleService] Recorded ${outcome.name} for $uid');
