@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../milestones/models/streak_badge.dart';
+import '../../milestones/screens/milestones_screen.dart';
+import '../../milestones/widget/current_badge_card.dart';
 import '../../theme/app_theme.dart';
 import '../cubit/battle_cubit.dart';
 import '../cubit/battle_state.dart';
@@ -38,6 +41,16 @@ class StatsScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 16),
+                CurrentBadgeCard(
+                  badges: evaluateStreakBadges(state.battles),
+                  bestStreak: state.bestStreak,
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => MilestonesScreen(battles: state.battles),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 18),
                 _RangeSelector(
                   selected: state.range,
                   onChanged: cubit.setRange,
