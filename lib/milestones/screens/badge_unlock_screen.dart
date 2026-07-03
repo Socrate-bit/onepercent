@@ -1,136 +1,116 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import '../../../shared/utils/haptic_utils.dart';
-import '../../insights/widgets/hexagon_badge.dart';
-import '../models/badge_model.dart';
+import '../../theme/app_theme.dart';
+import '../models/streak_badge.dart';
+import '../widget/hexagon_badge.dart';
 
+/// Full-screen celebration of a single earned badge: a glowing hexagon, the
+/// badge name, the day it unlocked, and its quote — on the app's dark palette.
 class BadgeUnlockScreen extends StatelessWidget {
-  final BadgeModel badge;
+  final StreakBadge badge;
 
   const BadgeUnlockScreen({super.key, required this.badge});
 
   @override
   Widget build(BuildContext context) {
-    final dateStr = badge.earnedDate != null
-        ? _formatDate(badge.earnedDate!)
-        : 'Today';
+    final dateStr =
+        badge.earnedDate != null ? _formatDate(badge.earnedDate!) : 'Today';
 
     return Scaffold(
-      body: Stack(
-        fit: StackFit.expand,
-        children: [
-          // Warm gradient
-          Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [Color(0xFFFFF8F0), Color(0xFFFFF0DC)],
+      backgroundColor: AppColors.background,
+      body: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: GestureDetector(
+                onTap: () => Navigator.pop(context),
+                child: Container(
+                  width: 36,
+                  height: 36,
+                  decoration: const BoxDecoration(
+                    color: AppColors.card,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.close,
+                      size: 18, color: AppColors.textPrimary),
+                ),
               ),
             ),
-          ),
-          SafeArea(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: EdgeInsets.all(16.w),
-                  child: GestureDetector(
-                    onTap: withHaptic(() => Navigator.pop(context)),
-                    child: Container(
-                      width: 36.w,
-                      height: 36.h,
-                      decoration: BoxDecoration(
-                        color: Colors.black.withAlpha(12),
-                        shape: BoxShape.circle,
+            const Spacer(),
+            Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 200,
+                    height: 200,
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: RadialGradient(
+                        colors: [Color(0x33FF7A1A), Colors.transparent],
                       ),
-                      child: Icon(Icons.close,
-                          size: 18.sp, color: const Color(0xFF3D2B1F)),
+                    ),
+                    child: Center(
+                      child: LargeHexagonBadge(
+                        label: '${badge.requiredDays}',
+                        size: 140,
+                      ),
                     ),
                   ),
-                ),
-                const Spacer(),
-                Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      // Glow effect
-                      Container(
-                        width: 180.w,
-                        height: 180.h,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          gradient: RadialGradient(
-                            colors: [
-                              Colors.orange.withAlpha(60),
-                              Colors.transparent,
-                            ],
-                          ),
-                        ),
-                        child: Center(
-                          child: LargeHexagonBadge(
-                            label:
-                                badge.requiredDays?.toString() ?? '★',
-                            color: const Color(0xFFE05C1A),
-                            size: 130.w,
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 32.h),
-                      Text(
-                        'BADGE UNLOCKED',
-                        style: TextStyle(
-                          fontSize: 13.sp,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 2,
-                          color: const Color(0xFFE05C1A),
-                        ),
-                      ),
-                      SizedBox(height: 12.h),
-                      Text(
-                        badge.name,
-                        style: TextStyle(
-                          fontSize: 32.sp,
-                          fontWeight: FontWeight.bold,
-                          color: const Color(0xFF2D1B00),
-                        ),
-                      ),
-                    ],
+                  const SizedBox(height: 32),
+                  const Text(
+                    'BADGE UNLOCKED',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 2,
+                      color: AppColors.fire,
+                    ),
                   ),
-                ),
-                const Spacer(),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 40.w),
-                  child: Column(
-                    children: [
-                      Text(
-                        'Unlocked $dateStr',
-                        style: TextStyle(
-                          fontSize: 14.sp,
-                          color: const Color(0xFF8B6E50),
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      SizedBox(height: 8.h),
-                      Text(
-                        badge.quote,
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 13.sp,
-                          fontStyle: FontStyle.italic,
-                          color: const Color(0xFF8B6E50),
-                          height: 1.5,
-                        ),
-                      ),
-                    ],
+                  const SizedBox(height: 12),
+                  Text(
+                    badge.name,
+                    style: const TextStyle(
+                      fontSize: 34,
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.textPrimary,
+                    ),
                   ),
-                ),
-                SizedBox(height: 48.h),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
+            const Spacer(),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 40),
+              child: Column(
+                children: [
+                  Text(
+                    'Unlocked $dateStr',
+                    style: const TextStyle(
+                      fontSize: 14,
+                      color: AppColors.textSecondary,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    badge.quote,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontStyle: FontStyle.italic,
+                      color: AppColors.textSecondary,
+                      height: 1.5,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 48),
+          ],
+        ),
       ),
     );
   }
