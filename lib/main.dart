@@ -61,7 +61,7 @@ class _BootstrapState extends State<_Bootstrap> {
           return const _Centered(child: CircularProgressIndicator());
         }
         final user = snapshot.data;
-        if (user == null) {
+        if (user == null ) {
           return const LoginScreen();
         }
         final uid = user.uid;

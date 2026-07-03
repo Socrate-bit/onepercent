@@ -28,7 +28,7 @@ class _HomeScreenState extends State<HomeScreen> {
   static const double _statCardHeight = 130;
 
   late final ConfettiController _confetti =
-      ConfettiController(duration: const Duration(seconds: 1));
+      ConfettiController(duration: const Duration(milliseconds: 600));
 
   @override
   void dispose() {
@@ -130,18 +130,20 @@ class _HomeScreenState extends State<HomeScreen> {
                 alignment: Alignment.topCenter,
                 child: ConfettiWidget(
                   confettiController: _confetti,
-                  blastDirection: math.pi / 2, // straight down
-                  emissionFrequency: 0.05,
-                  numberOfParticles: 24,
-                  maxBlastForce: 22,
-                  minBlastForce: 8,
-                  gravity: 0.25,
+                  blastDirection: math.pi / 2,
+                  blastDirectionality: BlastDirectionality.explosive,
+                  emissionFrequency: 0.9,
+                  numberOfParticles: 18,
+                  maxBlastForce: 50,
+                  minBlastForce: 30,
+                  gravity: 0.45,
                   shouldLoop: false,
                   colors: const [
-                    AppColors.win,
-                    AppColors.fire,
-                    Color(0xFF5AA9FF),
-                    Colors.white,
+                    Color(0xFF6D28D9), // purpleDeep
+                    AppColors.fire, // orange
+                    Colors.amber,
+                    Colors.greenAccent,
+                    Colors.lightBlueAccent,
                   ],
                 ),
               ),
