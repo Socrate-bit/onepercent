@@ -1,8 +1,10 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'auth/auth_service.dart';
+import 'auth/login_screen.dart';
 import 'battle/cubit/battle_cubit.dart';
 import 'battle/screen/history_screen.dart';
 import 'battle/screen/home_screen.dart';
@@ -38,7 +40,8 @@ class DisciplineApp extends StatelessWidget {
   }
 }
 
-/// Silently signs the user in anonymously, then wires up the [BattleCubit].
+/// Auth gate: shows the [LoginScreen] until the user signs in with Apple,
+/// then wires up the [BattleCubit]/[RecoveryCubit] for their uid.
 class _Bootstrap extends StatefulWidget {
   const _Bootstrap();
 
@@ -48,30 +51,23 @@ class _Bootstrap extends StatefulWidget {
 
 class _BootstrapState extends State<_Bootstrap> {
   final AuthService _auth = AuthService();
-  late final Future<String?> _signIn = _auth.ensureSignedIn();
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<String?>(
-      future: _signIn,
+    return StreamBuilder<User?>(
+      stream: _auth.authState,
       builder: (context, snapshot) {
-        if (snapshot.connectionState != ConnectionState.done) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
           return const _Centered(child: CircularProgressIndicator());
         }
-        final uid = snapshot.data;
-        if (snapshot.hasError || uid == null) {
-          return const _Centered(
-            child: Padding(
-              padding: EdgeInsets.all(24),
-              child: Text(
-                'Could not connect. Check your internet and reopen the app.',
-                textAlign: TextAlign.center,
-                style: TextStyle(color: AppColors.textSecondary),
-              ),
-            ),
-          );
+        final user = snapshot.data;
+        if (user == null) {
+          return const LoginScreen();
         }
+        final uid = user.uid;
         return MultiBlocProvider(
+          // Rebuild cubits when the signed-in account changes.
+          key: ValueKey(uid),
           providers: [
             BlocProvider(
               create: (_) => BattleCubit(service: BattleService(), uid: uid),
