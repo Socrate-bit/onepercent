@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 
 import '../models/battle.dart';
+import '../util/discipline_percentile.dart';
 
 /// Time window applied to the aggregate Stats metrics.
 enum StatsRange {
@@ -113,6 +114,24 @@ class BattleState extends Equatable {
   /// Lifetime total wins (not windowed) — shown on Home.
   int get totalWinsAllTime => battles.where((b) => b.isWin).length;
 
+  // --- This week (last 7 days) --------------------------------------------
+
+  /// Battles recorded in the last 7 days (today included).
+  List<Battle> get _thisWeekBattles {
+    final cutoff = _dateOnly(DateTime.now()).subtract(const Duration(days: 6));
+    return battles.where((b) => !_dateOnly(b.ts).isBefore(cutoff)).toList();
+  }
+
+  /// Number of battles fought this week.
+  int get battlesThisWeek => _thisWeekBattles.length;
+
+  /// Win rate this week as a percentage (0 when no battles this week).
+  double get winRateThisWeek {
+    final week = _thisWeekBattles;
+    if (week.isEmpty) return 0;
+    return week.where((b) => b.isWin).length / week.length * 100;
+  }
+
   // --- Windowed aggregates ------------------------------------------------
 
   /// Battles falling inside the selected [range].
@@ -130,6 +149,12 @@ class BattleState extends Equatable {
   /// Win rate as a percentage (0 when no battles in window).
   double get winRate =>
       battlesFought == 0 ? 0 : wins / battlesFought * 100;
+
+  /// Where this window's win rate places the user in the general population,
+  /// as a percentile (0–100), or null until there are enough battles to judge.
+  /// See [DisciplinePercentile] for the empirical basis.
+  double? get disciplinePercentile =>
+      DisciplinePercentile.forRecord(wins, battlesFought);
 
   /// Per-day tallies inside the window, oldest day first.
   List<DayTally> get dayTallies {

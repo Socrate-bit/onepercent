@@ -67,13 +67,14 @@ class CalendarHeatmap extends StatelessWidget {
 
   Color _colorFor(DayTally? t) {
     if (t == null || t.total == 0) return const Color(0xFF1E2530);
-    if (t.mostlyWins) {
-      // Deeper green for more wins.
-      final intensity = (0.45 + (t.wins.clamp(0, 5)) * 0.11).clamp(0.4, 1.0);
-      return AppColors.win.withValues(alpha: intensity);
-    }
-    final intensity = (0.45 + (t.losses.clamp(0, 5)) * 0.11).clamp(0.4, 1.0);
-    return AppColors.loss.withValues(alpha: intensity);
+    // Opacity tracks how lopsided the day was: a clean sweep is fully opaque,
+    // an even split fades toward transparent. `fraction` is the share held by
+    // the dominant side (always in [0.5, 1.0]).
+    final winFraction = t.wins / t.total;
+    final dominant = t.mostlyWins ? winFraction : 1 - winFraction;
+    final intensity = (0.25 + (dominant - 0.5) / 0.5 * 0.75).clamp(0.25, 1.0);
+    final base = t.mostlyWins ? AppColors.win : AppColors.loss;
+    return base.withValues(alpha: intensity);
   }
 
   Widget _legend() {

@@ -10,6 +10,10 @@ class StatCard extends StatelessWidget {
   final String value;
   final String? caption;
 
+  /// Optional fixed height. When set, the card ignores its content height so
+  /// side-by-side cards stay the same size regardless of their values.
+  final double? height;
+
   const StatCard({
     super.key,
     required this.icon,
@@ -17,11 +21,13 @@ class StatCard extends StatelessWidget {
     required this.label,
     required this.value,
     this.caption,
+    this.height,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
+      height: height,
       padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
       decoration: BoxDecoration(
         color: AppColors.card,
@@ -29,6 +35,7 @@ class StatCard extends StatelessWidget {
         border: Border.all(color: AppColors.cardBorder),
       ),
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(

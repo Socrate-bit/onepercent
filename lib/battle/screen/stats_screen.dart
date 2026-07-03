@@ -5,6 +5,7 @@ import '../../theme/app_theme.dart';
 import '../cubit/battle_cubit.dart';
 import '../cubit/battle_state.dart';
 import '../widget/calendar_heatmap.dart';
+import '../widget/percentile_card.dart';
 import '../widget/progress_chart.dart';
 import '../widget/stat_card.dart';
 
@@ -42,6 +43,12 @@ class StatsScreen extends StatelessWidget {
                   onChanged: cubit.setRange,
                 ),
                 const SizedBox(height: 18),
+                PercentileCard(
+                  percentile: state.disciplinePercentile,
+                  winRate: state.winRate,
+                  rangeLabel: state.range.label,
+                ),
+                const SizedBox(height: 18),
                 _grid(state),
                 const SizedBox(height: 24),
                 _section('CALENDAR', CalendarHeatmap(
@@ -51,8 +58,6 @@ class StatsScreen extends StatelessWidget {
                 const SizedBox(height: 24),
                 _section('PROGRESS OVER TIME',
                     ProgressChart(series: state.cumulativeSeries)),
-                const SizedBox(height: 24),
-                _section('INSIGHTS', _Insights(state)),
               ],
             ),
           );
@@ -193,71 +198,6 @@ class _RangeSelector extends StatelessWidget {
           );
         }).toList(),
       ),
-    );
-  }
-}
-
-/// A few lightweight, always-safe insights derived from the current window.
-class _Insights extends StatelessWidget {
-  final BattleState state;
-  const _Insights(this.state);
-
-  @override
-  Widget build(BuildContext context) {
-    final rows = <(IconData, Color, String)>[];
-
-    if (state.battlesFought == 0) {
-      rows.add((
-        Icons.info_outline_rounded,
-        AppColors.textSecondary,
-        'No battles in this range yet. Record your first decision.',
-      ));
-    } else {
-      rows.add((
-        Icons.bolt_rounded,
-        AppColors.fire,
-        state.winRate >= 50
-            ? 'You win ${state.winRate.toStringAsFixed(0)}% of your battles — keep it up.'
-            : 'Win rate is ${state.winRate.toStringAsFixed(0)}%. One win at a time.',
-      ));
-      rows.add((
-        Icons.emoji_events_rounded,
-        AppColors.win,
-        'Your best streak ever is ${state.bestStreak} in a row.',
-      ));
-      if (state.currentStreak > 0) {
-        rows.add((
-          Icons.local_fire_department_rounded,
-          AppColors.fire,
-          'You are on a ${state.currentStreak}-win streak right now.',
-        ));
-      }
-    }
-
-    return Column(
-      children: [
-        for (final r in rows)
-          Padding(
-            padding: const EdgeInsets.only(bottom: 12),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Icon(r.$1, color: r.$2, size: 18),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Text(
-                    r.$3,
-                    style: const TextStyle(
-                      color: AppColors.textPrimary,
-                      fontSize: 13,
-                      height: 1.35,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-      ],
     );
   }
 }

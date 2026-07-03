@@ -25,7 +25,7 @@ class ProgressChart extends StatelessWidget {
         SizedBox(
           height: 160,
           width: double.infinity,
-          child: series.length < 2
+          child: series.isEmpty
               ? const Center(
                   child: Text(
                     'Not enough data yet',
@@ -85,13 +85,15 @@ class _ChartPainter extends CustomPainter {
     }
 
     void drawLine(int Function(SeriesPoint) sel, Color color) {
+      final points = [
+        for (var i = 0; i < series.length; i++) pointAt(i, sel(series[i])),
+      ];
       final path = Path();
-      for (var i = 0; i < series.length; i++) {
-        final p = pointAt(i, sel(series[i]));
+      for (var i = 0; i < points.length; i++) {
         if (i == 0) {
-          path.moveTo(p.dx, p.dy);
+          path.moveTo(points[i].dx, points[i].dy);
         } else {
-          path.lineTo(p.dx, p.dy);
+          path.lineTo(points[i].dx, points[i].dy);
         }
       }
       canvas.drawPath(
@@ -103,6 +105,11 @@ class _ChartPainter extends CustomPainter {
           ..strokeJoin = StrokeJoin.round
           ..color = color,
       );
+      // Dot markers so a lone point (or endpoints) is always visible.
+      final dot = Paint()..color = color;
+      for (final p in points) {
+        canvas.drawCircle(p, 3, dot);
+      }
     }
 
     drawLine((p) => p.cumulativeLosses, AppColors.loss);

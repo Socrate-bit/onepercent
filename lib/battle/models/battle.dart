@@ -17,7 +17,19 @@ class Battle extends Equatable {
   final BattleOutcome outcome;
   final DateTime ts;
 
-  const Battle({required this.id, required this.outcome, required this.ts});
+  /// How hard the decision felt, on a 0–10 scale (0 if not captured).
+  final int difficulty;
+
+  /// Optional label for what the decision was (empty if not captured).
+  final String name;
+
+  const Battle({
+    required this.id,
+    required this.outcome,
+    required this.ts,
+    this.difficulty = 0,
+    this.name = '',
+  });
 
   bool get isWin => outcome == BattleOutcome.win;
   bool get isLoss => outcome == BattleOutcome.loss;
@@ -31,6 +43,8 @@ class Battle extends Equatable {
       ts: DateTime.fromMillisecondsSinceEpoch(
         (data['ts'] as num?)?.toInt() ?? 0,
       ),
+      difficulty: (data['difficulty'] as num?)?.toInt() ?? 0,
+      name: data['name'] as String? ?? '',
     );
   }
 
@@ -38,8 +52,10 @@ class Battle extends Equatable {
   Map<String, dynamic> toMap() => {
         'outcome': outcome.name,
         'ts': ts.millisecondsSinceEpoch,
+        'difficulty': difficulty,
+        'name': name,
       };
 
   @override
-  List<Object?> get props => [id, outcome, ts];
+  List<Object?> get props => [id, outcome, ts, difficulty, name];
 }

@@ -1,3 +1,6 @@
+import 'dart:math' as math;
+
+import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -5,14 +8,59 @@ import '../../breathing/breathing_screen.dart';
 import '../../theme/app_theme.dart';
 import '../cubit/battle_cubit.dart';
 import '../cubit/battle_state.dart';
+import '../models/battle.dart';
+import '../widget/difficulty_dialog.dart';
 import '../widget/stat_card.dart';
 import '../widget/streak_ring.dart';
 import '../widget/win_loss_buttons.dart';
 
 /// The "Today" tab: current streak, quick stats, and the Win/Loss/Breathe
 /// actions. Kept intentionally friction-free — open, record, move on.
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  /// Fixed height so BEST STREAK / WIN THIS WEEK cards stay the same size.
+  static const double _statCardHeight = 130;
+
+  late final ConfettiController _confetti =
+      ConfettiController(duration: const Duration(seconds: 1));
+
+  @override
+  void dispose() {
+    _confetti.dispose();
+    super.dispose();
+  }
+
+  /// Prompts for a 0–10 difficulty, then records the outcome. A win also fires
+  /// the confetti burst. Bailing out of the dialog records nothing.
+  Future<void> _record(BattleOutcome outcome) async {
+    final cubit = context.read<BattleCubit>();
+    final entry = await showDifficultyDialog(context, outcome);
+    if (entry == null) return;
+
+    if (outcome == BattleOutcome.win) {
+      cubit.recordWin(difficulty: entry.difficulty, name: entry.name);
+      _confetti.play();
+    } else {
+      cubit.recordLoss(difficulty: entry.difficulty, name: entry.name);
+      if (entry.breathe && mounted) {
+        await _startBreathing(context);
+      }
+    }
+  }
+
+  Future<void> _startBreathing(BuildContext context) async {
+    final rounds = await showBreathingSetupDialog(context);
+    if (rounds == null || !context.mounted) return;
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => BreathingScreen(rounds: rounds)),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,53 +74,78 @@ class HomeScreen extends StatelessWidget {
             ..showSnackBar(SnackBar(content: Text(state.error!)));
         },
         builder: (context, state) {
-          final cubit = context.read<BattleCubit>();
-          return SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                _header(state.totalWinsAllTime),
-                const SizedBox(height: 24),
-                Center(child: StreakRing(streak: state.currentStreak)),
-                const SizedBox(height: 24),
-                Row(
+          return Stack(
+            children: [
+              SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Expanded(
-                      child: StatCard(
-                        icon: Icons.emoji_events_rounded,
-                        accent: AppColors.fire,
-                        label: 'BEST STREAK',
-                        value: '${state.bestStreak}',
-                        caption: 'days',
-                      ),
+                    _header(state.totalWinsAllTime),
+                    const SizedBox(height: 24),
+                    Center(child: StreakRing(streak: state.currentStreak)),
+                    const SizedBox(height: 24),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: StatCard(
+                            height: _statCardHeight,
+                            icon: Icons.emoji_events_rounded,
+                            accent: AppColors.fire,
+                            label: 'BEST STREAK',
+                            value: '${state.bestStreak}',
+                            caption: 'days',
+                          ),
+                        ),
+                        const SizedBox(width: 14),
+                        Expanded(
+                          child: StatCard(
+                            height: _statCardHeight,
+                            icon: Icons.percent_rounded,
+                            accent: AppColors.win,
+                            label: 'WIN % THIS WEEK',
+                            value:
+                                '${state.winRateThisWeek.toStringAsFixed(0)}%',
+                            caption: '${state.battlesThisWeek} battles',
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(width: 14),
-                    Expanded(
-                      child: StatCard(
-                        icon: Icons.trending_up_rounded,
-                        accent: AppColors.win,
-                        label: 'TOTAL WINS',
-                        value: '${state.totalWinsAllTime}',
-                      ),
+                    const SizedBox(height: 18),
+                    WinLossButtons(
+                      onWin: () => _record(BattleOutcome.win),
+                      onLoss: () => _record(BattleOutcome.loss),
                     ),
+                    const SizedBox(height: 16),
+                    _BreatheButton(
+                      onTap: () => _startBreathing(context),
+                    ),
+                    const SizedBox(height: 24),
+                    const _Quote(
+                        'I choose greatness over short-term comfort.'),
                   ],
                 ),
-                const SizedBox(height: 18),
-                WinLossButtons(
-                  onWin: cubit.recordWin,
-                  onLoss: cubit.recordLoss,
+              ),
+              Align(
+                alignment: Alignment.topCenter,
+                child: ConfettiWidget(
+                  confettiController: _confetti,
+                  blastDirection: math.pi / 2, // straight down
+                  emissionFrequency: 0.05,
+                  numberOfParticles: 24,
+                  maxBlastForce: 22,
+                  minBlastForce: 8,
+                  gravity: 0.25,
+                  shouldLoop: false,
+                  colors: const [
+                    AppColors.win,
+                    AppColors.fire,
+                    Color(0xFF5AA9FF),
+                    Colors.white,
+                  ],
                 ),
-                const SizedBox(height: 16),
-                _BreatheButton(
-                  onTap: () => Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const BreathingScreen()),
-                  ),
-                ),
-                const SizedBox(height: 24),
-                const _Quote('I choose discipline over comfort.'),
-              ],
-            ),
+              ),
+            ],
           );
         },
       ),
@@ -86,7 +159,7 @@ class HomeScreen extends StatelessWidget {
           child: Column(
             children: [
               Text(
-                'DISCIPLINE',
+                'ONE PERCENT',
                 style: TextStyle(
                   color: AppColors.textPrimary,
                   fontSize: 18,
