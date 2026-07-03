@@ -9,9 +9,10 @@ import 'history_detail_screen.dart';
 
 /// Maps a difficulty (0–10) to a color: red (hardest) → blue (easiest).
 Color difficultyColor(num difficulty) {
-  if (difficulty > 7) return AppColors.loss; // red
-  if (difficulty > 5) return const Color(0xFFEAB308); // yellow
-  if (difficulty > 2.5) return AppColors.win; // green
+  if (difficulty > 9) return Colors.purple;
+  if (difficulty >= 7.5) return AppColors.loss; // red
+  if (difficulty >= 5) return const Color(0xFFEAB308); // yellow
+  if (difficulty >= 2.5) return AppColors.win; // green
   return const Color(0xFF3B82F6); // blue
 }
 
