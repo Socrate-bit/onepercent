@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'auth/auth_service.dart';
 import 'auth/login_screen.dart';
@@ -33,11 +34,17 @@ class DisciplineApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Discipline',
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.dark,
-      home: const _Bootstrap(),
+    return ScreenUtilInit(
+      designSize: const Size(414, 896), // iPhone 11 logical size
+      minTextAdapt: true,
+      splitScreenMode: false,
+      builder: (context, child) => MaterialApp(
+        title: 'Discipline',
+        debugShowCheckedModeBanner: false,
+        theme: AppTheme.dark,
+        home: child,
+      ),
+      child: const _Bootstrap(),
     );
   }
 }

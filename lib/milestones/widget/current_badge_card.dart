@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../theme/app_theme.dart';
 import '../models/streak_badge.dart';
@@ -42,14 +43,14 @@ class CurrentBadgeCard extends StatelessWidget {
 
     return Material(
       color: AppColors.card,
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(16.r),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(16.r),
         child: Container(
-          padding: const EdgeInsets.all(16),
+          padding: EdgeInsets.all(16.r),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(16.r),
             border: Border.all(color: AppColors.cardBorder),
           ),
           child: Row(
@@ -57,46 +58,46 @@ class CurrentBadgeCard extends StatelessWidget {
               HexagonBadge(
                 label: current != null ? '${current.requiredDays}' : '',
                 earned: current != null,
-                size: 56,
+                size: 56.r,
               ),
-              const SizedBox(width: 14),
+              SizedBox(width: 14.w),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       'CURRENT BADGE',
                       style: TextStyle(
                         color: AppColors.fire,
-                        fontSize: 11,
+                        fontSize: 11.sp,
                         fontWeight: FontWeight.w800,
-                        letterSpacing: 1,
+                        letterSpacing: 1.sp,
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    SizedBox(height: 4.h),
                     Text(
                       title,
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: AppColors.textPrimary,
-                        fontSize: 18,
+                        fontSize: 18.sp,
                         fontWeight: FontWeight.w800,
                       ),
                     ),
-                    const SizedBox(height: 6),
+                    SizedBox(height: 6.h),
                     Text(
                       subtitle,
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: AppColors.textSecondary,
-                        fontSize: 12,
+                        fontSize: 12.sp,
                       ),
                     ),
                     if (progress != null) ...[
-                      const SizedBox(height: 8),
+                      SizedBox(height: 8.h),
                       ClipRRect(
-                        borderRadius: BorderRadius.circular(4),
+                        borderRadius: BorderRadius.circular(4.r),
                         child: LinearProgressIndicator(
                           value: progress,
-                          minHeight: 5,
+                          minHeight: 5.h,
                           backgroundColor: AppColors.cardBorder,
                           valueColor:
                               const AlwaysStoppedAnimation(AppColors.fire),
@@ -106,7 +107,7 @@ class CurrentBadgeCard extends StatelessWidget {
                   ],
                 ),
               ),
-              const SizedBox(width: 8),
+              SizedBox(width: 8.w),
               const Icon(Icons.chevron_right_rounded,
                   color: AppColors.textSecondary),
             ],

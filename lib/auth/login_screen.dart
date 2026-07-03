@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 import '../theme/app_theme.dart';
@@ -58,30 +59,30 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 32),
+          padding: EdgeInsets.symmetric(horizontal: 32.w),
           child: Column(
             children: [
               const Spacer(flex: 3),
-              const Icon(
+              Icon(
                 Icons.local_fire_department,
-                size: 72,
+                size: 72.r,
                 color: AppColors.fire,
               ),
-              const SizedBox(height: 24),
-              const Text(
+              SizedBox(height: 24.h),
+              Text(
                 'Discipline',
                 style: TextStyle(
-                  fontSize: 34,
+                  fontSize: 34.sp,
                   fontWeight: FontWeight.w700,
                   color: AppColors.textPrimary,
                 ),
               ),
-              const SizedBox(height: 12),
-              const Text(
+              SizedBox(height: 12.h),
+              Text(
                 'Sign in to track your wins and keep your streak.',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: 16,
+                  fontSize: 16.sp,
                   color: AppColors.textSecondary,
                 ),
               ),
@@ -92,16 +93,16 @@ class _LoginScreenState extends State<LoginScreen> {
                   textAlign: TextAlign.center,
                   style: const TextStyle(color: AppColors.loss),
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: 16.h),
               ],
               SizedBox(
-                height: 52,
+                height: 52.h,
                 child: _busy
                     ? const Center(child: CircularProgressIndicator())
                     : SignInWithAppleButton(
                         onPressed: _signIn,
                         style: SignInWithAppleButtonStyle.white,
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(12.r),
                       ),
               ),
               const Spacer(flex: 1),

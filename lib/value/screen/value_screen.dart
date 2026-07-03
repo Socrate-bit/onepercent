@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../theme/app_theme.dart';
 import '../cubit/value_cubit.dart';
@@ -47,9 +48,9 @@ class ValueScreen extends StatelessWidget {
           builder: (context, state) {
             return CustomScrollView(
               slivers: [
-                const SliverPadding(
-                  padding: EdgeInsets.fromLTRB(20, 8, 20, 16),
-                  sliver: SliverToBoxAdapter(child: _Header()),
+                SliverPadding(
+                  padding: EdgeInsets.fromLTRB(20.w, 8.h, 20.w, 16.h),
+                  sliver: const SliverToBoxAdapter(child: _Header()),
                 ),
                 if (state.loading && state.values.isEmpty)
                   const SliverFillRemaining(
@@ -63,7 +64,7 @@ class ValueScreen extends StatelessWidget {
                   )
                 else
                   SliverPadding(
-                    padding: const EdgeInsets.fromLTRB(20, 0, 20, 96),
+                    padding: EdgeInsets.fromLTRB(20.w, 0, 20.w, 96.h),
                     sliver: SliverReorderableList(
                       itemCount: state.values.length,
                       onReorder: (oldIndex, newIndex) =>
@@ -90,22 +91,22 @@ class _Header extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Column(
+    return Column(
       children: [
         Text(
           'YOUR VALUES',
           style: TextStyle(
             color: AppColors.textPrimary,
-            fontSize: 18,
+            fontSize: 18.sp,
             fontWeight: FontWeight.w800,
-            letterSpacing: 2,
+            letterSpacing: 2.sp,
           ),
         ),
-        SizedBox(height: 2),
+        SizedBox(height: 2.h),
         Text(
           'Rank what matters most. Drag to reorder, then tag them on your wins and losses.',
           textAlign: TextAlign.center,
-          style: TextStyle(color: AppColors.textSecondary, fontSize: 13),
+          style: TextStyle(color: AppColors.textSecondary, fontSize: 13.sp),
         ),
       ],
     );
@@ -128,43 +129,43 @@ class _ValueRow extends StatelessWidget {
     final cubit = context.read<ValueCubit>();
 
     return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
+      padding: EdgeInsets.only(bottom: 10.h),
       child: Material(
         color: AppColors.card,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(16.r),
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(16.r),
             border: Border.all(color: AppColors.cardBorder),
           ),
           child: Row(
             children: [
               // Rank badge showing the value's place in the ranking.
               Container(
-                width: 30,
-                height: 30,
+                width: 30.r,
+                height: 30.r,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
                   color: AppColors.fire.withValues(alpha: 0.16),
-                  borderRadius: BorderRadius.circular(9),
+                  borderRadius: BorderRadius.circular(9.r),
                 ),
                 child: Text(
                   '$rank',
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: AppColors.fire,
-                    fontSize: 14,
+                    fontSize: 14.sp,
                     fontWeight: FontWeight.w800,
                   ),
                 ),
               ),
-              const SizedBox(width: 14),
+              SizedBox(width: 14.w),
               Expanded(
                 child: Text(
                   value.title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: AppColors.textPrimary,
-                    fontSize: 15,
+                    fontSize: 15.sp,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -173,14 +174,14 @@ class _ValueRow extends StatelessWidget {
                 onPressed: () => cubit.deleteValue(value.id),
                 icon: const Icon(Icons.delete_outline_rounded),
                 color: AppColors.textSecondary,
-                splashRadius: 22,
+                splashRadius: 22.r,
                 tooltip: 'Delete value',
               ),
               ReorderableDragStartListener(
                 index: index,
-                child: const Padding(
-                  padding: EdgeInsets.only(left: 4),
-                  child: Icon(Icons.drag_handle_rounded,
+                child: Padding(
+                  padding: EdgeInsets.only(left: 4.w),
+                  child: const Icon(Icons.drag_handle_rounded,
                       color: AppColors.textSecondary),
                 ),
               ),
@@ -197,27 +198,28 @@ class _EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.all(32),
+    return Padding(
+      padding: EdgeInsets.all(32.r),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.favorite_rounded, color: AppColors.textSecondary, size: 48),
-          SizedBox(height: 12),
+          Icon(Icons.favorite_rounded,
+              color: AppColors.textSecondary, size: 48.r),
+          SizedBox(height: 12.h),
           Text(
             'No values yet',
             style: TextStyle(
               color: AppColors.textPrimary,
-              fontSize: 16,
+              fontSize: 16.sp,
               fontWeight: FontWeight.w700,
             ),
           ),
-          SizedBox(height: 4),
+          SizedBox(height: 4.h),
           Text(
             'Tap + to name what you stand for.',
             textAlign: TextAlign.center,
-            style: TextStyle(color: AppColors.textSecondary, fontSize: 13),
+            style: TextStyle(color: AppColors.textSecondary, fontSize: 13.sp),
           ),
         ],
       ),

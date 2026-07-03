@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../theme/app_theme.dart';
 import '../cubit/battle_state.dart';
@@ -24,14 +25,14 @@ class CalendarHeatmap extends StatelessWidget {
     final totalDays = today.difference(gridStart).inDays + 1;
     final weeks = (totalDays / 7).ceil();
 
-    const cell = 15.0;
-    const gap = 4.0;
+    final cell = 15.r;
+    final gap = 4.r;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _legend(),
-        const SizedBox(height: 12),
+        SizedBox(height: 12.h),
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           reverse: true,
@@ -39,19 +40,19 @@ class CalendarHeatmap extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: List.generate(weeks, (w) {
               return Padding(
-                padding: const EdgeInsets.only(right: gap),
+                padding: EdgeInsets.only(right: gap),
                 child: Column(
                   children: List.generate(7, (d) {
                     final date = gridStart.add(Duration(days: w * 7 + d));
                     final inRange = !date.isBefore(start) && !date.isAfter(today);
                     return Padding(
-                      padding: const EdgeInsets.only(bottom: gap),
+                      padding: EdgeInsets.only(bottom: gap),
                       child: Container(
                         width: cell,
                         height: cell,
                         decoration: BoxDecoration(
                           color: _colorFor(inRange ? byDay[date] : null),
-                          borderRadius: BorderRadius.circular(3),
+                          borderRadius: BorderRadius.circular(3.r),
                         ),
                       ),
                     );
@@ -81,22 +82,22 @@ class CalendarHeatmap extends StatelessWidget {
     return Row(
       children: [
         _dot(AppColors.win),
-        const SizedBox(width: 6),
-        const Text('more wins',
-            style: TextStyle(color: AppColors.textSecondary, fontSize: 12)),
-        const SizedBox(width: 16),
+        SizedBox(width: 6.w),
+        Text('more wins',
+            style: TextStyle(color: AppColors.textSecondary, fontSize: 12.sp)),
+        SizedBox(width: 16.w),
         _dot(AppColors.loss),
-        const SizedBox(width: 6),
-        const Text('more losses',
-            style: TextStyle(color: AppColors.textSecondary, fontSize: 12)),
+        SizedBox(width: 6.w),
+        Text('more losses',
+            style: TextStyle(color: AppColors.textSecondary, fontSize: 12.sp)),
       ],
     );
   }
 
   Widget _dot(Color c) => Container(
-        width: 10,
-        height: 10,
-        decoration: BoxDecoration(color: c, borderRadius: BorderRadius.circular(2)),
+        width: 10.r,
+        height: 10.r,
+        decoration: BoxDecoration(color: c, borderRadius: BorderRadius.circular(2.r)),
       );
 
   static DateTime _dateOnly(DateTime d) => DateTime(d.year, d.month, d.day);

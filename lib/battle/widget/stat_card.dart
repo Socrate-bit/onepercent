@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../theme/app_theme.dart';
 
@@ -28,10 +29,10 @@ class StatCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: height,
-      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+      padding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 16.w),
       decoration: BoxDecoration(
         color: AppColors.card,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(16.r),
         border: Border.all(color: AppColors.cardBorder),
       ),
       child: Column(
@@ -40,38 +41,38 @@ class StatCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(icon, color: accent, size: 18),
-              const SizedBox(width: 6),
+              Icon(icon, color: accent, size: 18.r),
+              SizedBox(width: 6.w),
               Expanded(
                 child: Text(
                   label,
                   style: TextStyle(
                     color: accent,
-                    fontSize: 11,
+                    fontSize: 11.sp,
                     fontWeight: FontWeight.w700,
-                    letterSpacing: 0.8,
+                    letterSpacing: 0.8.sp,
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 10),
+          SizedBox(height: 10.h),
           Text(
             value,
-            style: const TextStyle(
+            style: TextStyle(
               color: AppColors.textPrimary,
-              fontSize: 26,
+              fontSize: 26.sp,
               fontWeight: FontWeight.w800,
             ),
           ),
           if (caption != null) ...[
-            const SizedBox(height: 2),
+            SizedBox(height: 2.h),
             Text(
               caption!,
-              style: const TextStyle(
+              style: TextStyle(
                 color: AppColors.textSecondary,
-                fontSize: 12,
+                fontSize: 12.sp,
               ),
             ),
           ],

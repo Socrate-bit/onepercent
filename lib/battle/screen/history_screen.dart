@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../theme/app_theme.dart';
 import '../cubit/battle_cubit.dart';
@@ -43,17 +44,17 @@ class _HistoryScreenState extends State<HistoryScreen> {
           }
           return CustomScrollView(
             slivers: [
-              const SliverPadding(
-                padding: EdgeInsets.fromLTRB(20, 8, 20, 12),
+              SliverPadding(
+                padding: EdgeInsets.fromLTRB(20.w, 8.h, 20.w, 12.h),
                 sliver: SliverToBoxAdapter(
                   child: Center(
                     child: Text(
                       'HISTORY',
                       style: TextStyle(
                         color: AppColors.textPrimary,
-                        fontSize: 18,
+                        fontSize: 18.sp,
                         fontWeight: FontWeight.w800,
-                        letterSpacing: 2,
+                        letterSpacing: 2.sp,
                       ),
                     ),
                   ),
@@ -61,7 +62,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
               ),
               if (battles.isNotEmpty)
                 SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
+                  padding: EdgeInsets.fromLTRB(20.w, 0, 20.w, 12.h),
                   sliver: SliverToBoxAdapter(
                     child: Align(
                       alignment: Alignment.centerRight,
@@ -85,10 +86,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 )
               else
                 SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
+                  padding: EdgeInsets.fromLTRB(20.w, 0, 20.w, 24.h),
                   sliver: SliverList.separated(
                     itemCount: battles.length,
-                    separatorBuilder: (_, _) => const SizedBox(height: 10),
+                    separatorBuilder: (_, _) => SizedBox(height: 10.h),
                     itemBuilder: (_, i) => _BattleRow(battle: battles[i]),
                   ),
                 ),
@@ -113,14 +114,14 @@ class _SortToggle extends StatelessWidget {
       color: sortByDifficulty
           ? AppColors.fire.withValues(alpha: 0.14)
           : AppColors.card,
-      borderRadius: BorderRadius.circular(20),
+      borderRadius: BorderRadius.circular(20.r),
       child: InkWell(
         onTap: () => onChanged(!sortByDifficulty),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(20.r),
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+          padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 7.h),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(20.r),
             border: Border.all(
               color: sortByDifficulty
                   ? AppColors.fire.withValues(alpha: 0.4)
@@ -130,13 +131,13 @@ class _SortToggle extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.whatshot_rounded, color: accent, size: 15),
-              const SizedBox(width: 6),
+              Icon(Icons.whatshot_rounded, color: accent, size: 15.r),
+              SizedBox(width: 6.w),
               Text(
                 sortByDifficulty ? 'Most difficult' : 'Sort by difficulty',
                 style: TextStyle(
                   color: accent,
-                  fontSize: 12,
+                  fontSize: 12.sp,
                   fontWeight: FontWeight.w700,
                 ),
               ),
@@ -159,36 +160,36 @@ class _BattleRow extends StatelessWidget {
 
     return Material(
       color: AppColors.card,
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(16.r),
       child: InkWell(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(16.r),
         onTap: () => Navigator.of(context).push(
           MaterialPageRoute(
             builder: (_) => HistoryDetailScreen(battle: battle),
           ),
         ),
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(16.r),
             border: Border.all(color: AppColors.cardBorder),
           ),
           child: Row(
         children: [
           Container(
-            width: 44,
-            height: 44,
+            width: 44.r,
+            height: 44.r,
             decoration: BoxDecoration(
               color: accent.withValues(alpha: 0.14),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(12.r),
             ),
             child: Icon(
               isWin ? Icons.check_circle_rounded : Icons.cancel_rounded,
               color: accent,
-              size: 26,
+              size: 26.r,
             ),
           ),
-          const SizedBox(width: 14),
+          SizedBox(width: 14.w),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -199,23 +200,23 @@ class _BattleRow extends StatelessWidget {
                       isWin ? 'WIN' : 'LOSS',
                       style: TextStyle(
                         color: accent,
-                        fontSize: 15,
+                        fontSize: 15.sp,
                         fontWeight: FontWeight.w800,
-                        letterSpacing: 1,
+                        letterSpacing: 1.sp,
                       ),
                     ),
                     if (battle.source != BattleSource.normal) ...[
-                      const SizedBox(width: 8),
+                      SizedBox(width: 8.w),
                       Flexible(child: _SourceChip(source: battle.source)),
                     ],
                   ],
                 ),
-                const SizedBox(height: 2),
+                SizedBox(height: 2.h),
                 Text(
                   formatBattleDate(battle.ts),
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: AppColors.textSecondary,
-                    fontSize: 13,
+                    fontSize: 13.sp,
                   ),
                 ),
               ],
@@ -238,10 +239,10 @@ class _DifficultyChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final color = difficultyColor(difficulty);
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.14),
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(10.r),
         border: Border.all(color: color.withValues(alpha: 0.4)),
       ),
       child: Column(
@@ -250,16 +251,16 @@ class _DifficultyChip extends StatelessWidget {
             '$difficulty',
             style: TextStyle(
               color: color,
-              fontSize: 16,
+              fontSize: 16.sp,
               fontWeight: FontWeight.w800,
             ),
           ),
-          const Text(
+          Text(
             'diff',
             style: TextStyle(
               color: AppColors.textSecondary,
-              fontSize: 10,
-              letterSpacing: 1,
+              fontSize: 10.sp,
+              letterSpacing: 1.sp,
             ),
           ),
         ],
@@ -285,22 +286,22 @@ class _SourceChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final badge = sourceBadge(source);
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
       decoration: BoxDecoration(
         color: AppColors.win.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(8.r),
         border: Border.all(color: AppColors.win.withValues(alpha: 0.35)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(badge.icon, color: AppColors.win, size: 13),
-          const SizedBox(width: 5),
+          Icon(badge.icon, color: AppColors.win, size: 13.r),
+          SizedBox(width: 5.w),
           Text(
             badge.label,
-            style: const TextStyle(
+            style: TextStyle(
               color: AppColors.win,
-              fontSize: 11,
+              fontSize: 11.sp,
               fontWeight: FontWeight.w700,
             ),
           ),
@@ -315,27 +316,27 @@ class _EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.all(32),
+    return Padding(
+      padding: EdgeInsets.all(32.r),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(Icons.history_rounded,
-              color: AppColors.textSecondary, size: 48),
-          SizedBox(height: 12),
+              color: AppColors.textSecondary, size: 48.r),
+          SizedBox(height: 12.h),
           Text(
             'No battles yet',
             style: TextStyle(
               color: AppColors.textPrimary,
-              fontSize: 16,
+              fontSize: 16.sp,
               fontWeight: FontWeight.w700,
             ),
           ),
-          SizedBox(height: 4),
+          SizedBox(height: 4.h),
           Text(
             'Record your first win or loss on the Today tab.',
             textAlign: TextAlign.center,
-            style: TextStyle(color: AppColors.textSecondary, fontSize: 13),
+            style: TextStyle(color: AppColors.textSecondary, fontSize: 13.sp),
           ),
         ],
       ),

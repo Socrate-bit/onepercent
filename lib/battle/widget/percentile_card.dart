@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../theme/app_theme.dart';
 
@@ -29,9 +30,9 @@ class PercentileCard extends StatelessWidget {
       onTap: ready ? () => _showMethodology(context) : null,
       child: Container(
         width: double.infinity,
-        padding: const EdgeInsets.all(20),
+        padding: EdgeInsets.all(20.r),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(20.r),
           border: Border.all(color: AppColors.cardBorder),
           gradient: const LinearGradient(
             begin: Alignment.topLeft,
@@ -52,77 +53,77 @@ class PercentileCard extends StatelessWidget {
       children: [
         Row(
           children: [
-            const Icon(Icons.public_rounded, color: AppColors.win, size: 18),
-            const SizedBox(width: 6),
-            const Text(
+            Icon(Icons.public_rounded, color: AppColors.win, size: 18.r),
+            SizedBox(width: 6.w),
+            Text(
               'POPULATION RANK',
               style: TextStyle(
                 color: AppColors.win,
-                fontSize: 11,
+                fontSize: 11.sp,
                 fontWeight: FontWeight.w700,
-                letterSpacing: 0.8,
+                letterSpacing: 0.8.sp,
               ),
             ),
             const Spacer(),
             if (rounded >= 50) _topBadge(topPct),
-            const SizedBox(width: 6),
-            const Icon(Icons.info_outline_rounded,
-                color: AppColors.textSecondary, size: 16),
+            SizedBox(width: 6.w),
+            Icon(Icons.info_outline_rounded,
+                color: AppColors.textSecondary, size: 16.r),
           ],
         ),
-        const SizedBox(height: 14),
-        const Text(
+        SizedBox(height: 14.h),
+        Text(
           "You're more disciplined than",
           style: TextStyle(
             color: AppColors.textPrimary,
-            fontSize: 14,
+            fontSize: 14.sp,
             fontWeight: FontWeight.w600,
           ),
         ),
-        const SizedBox(height: 4),
+        SizedBox(height: 4.h),
         Row(
           crossAxisAlignment: CrossAxisAlignment.baseline,
           textBaseline: TextBaseline.alphabetic,
           children: [
             Text(
               '$rounded',
-              style: const TextStyle(
+              style: TextStyle(
                 color: AppColors.textPrimary,
-                fontSize: 46,
+                fontSize: 46.sp,
                 fontWeight: FontWeight.w800,
                 height: 1,
               ),
             ),
-            const Padding(
-              padding: EdgeInsets.only(left: 2, bottom: 6),
+            Padding(
+              padding: EdgeInsets.only(left: 2.w, bottom: 6.h),
               child: Text(
                 '%',
                 style: TextStyle(
                   color: AppColors.textPrimary,
-                  fontSize: 22,
+                  fontSize: 22.sp,
                   fontWeight: FontWeight.w800,
                 ),
               ),
             ),
-            const Padding(
-              padding: EdgeInsets.only(left: 8, bottom: 6),
+            Padding(
+              padding: EdgeInsets.only(left: 8.w, bottom: 6.h),
               child: Text(
                 'of the population',
                 style: TextStyle(
                   color: AppColors.textSecondary,
-                  fontSize: 14,
+                  fontSize: 14.sp,
                   fontWeight: FontWeight.w600,
                 ),
               ),
             ),
           ],
         ),
-        const SizedBox(height: 6),
+        SizedBox(height: 6.h),
         Text(
           'Based on your ${winRate.toStringAsFixed(0)}% win rate · ${rangeLabel.toLowerCase()}',
-          style: const TextStyle(
+          style: TextStyle(
             color: AppColors.textSecondary,
-            fontSize: 12,
+            fontSize: 12.sp,
           ),
         ),
       ],
@@ -134,26 +135,26 @@ class PercentileCard extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
-          children: const [
-            Icon(Icons.public_rounded, color: AppColors.textSecondary, size: 18),
-            SizedBox(width: 6),
+          children: [
+            Icon(Icons.public_rounded, color: AppColors.textSecondary, size: 18.r),
+            SizedBox(width: 6.w),
             Text(
               'POPULATION RANK',
               style: TextStyle(
                 color: AppColors.textSecondary,
-                fontSize: 11,
+                fontSize: 11.sp,
                 fontWeight: FontWeight.w700,
-                letterSpacing: 0.8,
+                letterSpacing: 0.8.sp,
               ),
             ),
           ],
         ),
-        const SizedBox(height: 14),
-        const Text(
+        SizedBox(height: 14.h),
+        Text(
           'Fight a few battles to see where you rank against the population.',
           style: TextStyle(
             color: AppColors.textPrimary,
-            fontSize: 14,
+            fontSize: 14.sp,
             fontWeight: FontWeight.w600,
             height: 1.3,
           ),
@@ -164,18 +165,18 @@ class PercentileCard extends StatelessWidget {
 
   Widget _topBadge(int topPct) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 3.h),
       decoration: BoxDecoration(
         color: AppColors.win.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(8.r),
       ),
       child: Text(
         'TOP $topPct%',
-        style: const TextStyle(
+        style: TextStyle(
           color: AppColors.win,
-          fontSize: 11,
+          fontSize: 11.sp,
           fontWeight: FontWeight.w800,
-          letterSpacing: 0.5,
+          letterSpacing: 0.5.sp,
         ),
       ),
     );
@@ -187,18 +188,18 @@ class PercentileCard extends StatelessWidget {
       builder: (context) => AlertDialog(
         backgroundColor: AppColors.card,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(18.r),
           side: const BorderSide(color: AppColors.cardBorder),
         ),
-        title: const Text(
+        title: Text(
           'How your rank is estimated',
           style: TextStyle(
             color: AppColors.textPrimary,
-            fontSize: 16,
+            fontSize: 16.sp,
             fontWeight: FontWeight.w800,
           ),
         ),
-        content: const Text(
+        content: Text(
           'People who actively resist a temptation succeed on about 83% of '
           'occasions (Hofmann, Baumeister & Vohs). We treat the population as a '
           'normal distribution around that average and compare your win rate to '
@@ -207,7 +208,7 @@ class PercentileCard extends StatelessWidget {
           'It\'s a research-grounded estimate, not a precise measurement.',
           style: TextStyle(
             color: AppColors.textSecondary,
-            fontSize: 13,
+            fontSize: 13.sp,
             height: 1.45,
           ),
         ),

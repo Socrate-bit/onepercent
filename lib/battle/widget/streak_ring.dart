@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../theme/app_theme.dart';
 
@@ -17,37 +18,37 @@ class StreakRing extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: size,
-      height: size,
+      width: size.r,
+      height: size.r,
       child: CustomPaint(
         painter: _RingPainter(),
         child: Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text(
+              Text(
                 'CURRENT STREAK',
                 style: TextStyle(
                   color: AppColors.fire,
-                  fontSize: 12,
+                  fontSize: 12.sp,
                   fontWeight: FontWeight.w700,
-                  letterSpacing: 1.5,
+                  letterSpacing: 1.5.sp,
                 ),
               ),
-              const SizedBox(height: 6),
+              SizedBox(height: 6.h),
               Text(
                 '$streak',
-                style: const TextStyle(
+                style: TextStyle(
                   color: AppColors.textPrimary,
-                  fontSize: 64,
+                  fontSize: 64.sp,
                   fontWeight: FontWeight.w800,
                   height: 1,
                 ),
               ),
-              const SizedBox(height: 2),
-              const Text(
+              SizedBox(height: 2.h),
+              Text(
                 'days',
-                style: TextStyle(color: AppColors.textSecondary, fontSize: 15),
+                style: TextStyle(color: AppColors.textSecondary, fontSize: 15.sp),
               ),
             ],
           ),
@@ -61,20 +62,20 @@ class _RingPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
-    final radius = size.shortestSide / 2 - 8;
+    final radius = size.shortestSide / 2 - 8.r;
 
     // Outer glow.
     final glow = Paint()
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 16
+      ..strokeWidth = 16.r
       ..color = AppColors.fire.withValues(alpha: 0.20)
-      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 12);
+      ..maskFilter = MaskFilter.blur(BlurStyle.normal, 12.r);
     canvas.drawCircle(center, radius, glow);
 
     // Bright fiery ring (sweep gradient of orange tones).
     final ring = Paint()
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 6
+      ..strokeWidth = 6.r
       ..strokeCap = StrokeCap.round
       ..shader = SweepGradient(
         colors: const [

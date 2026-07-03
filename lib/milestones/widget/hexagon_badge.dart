@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../theme/app_theme.dart';
 
@@ -101,13 +102,13 @@ class _HexPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
-    final radius = size.shortestSide / 2 - 2;
+    final radius = size.shortestSide / 2 - 2.r;
     final path = _hexPath(center, radius);
 
     if (earned && glow) {
       final glowPaint = Paint()
         ..color = earnedColor.withValues(alpha: 0.5)
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 18);
+        ..maskFilter = MaskFilter.blur(BlurStyle.normal, 18.r);
       canvas.drawPath(path, glowPaint);
     }
 
@@ -131,7 +132,7 @@ class _HexPainter extends CustomPainter {
     // Border.
     final border = Paint()
       ..style = PaintingStyle.stroke
-      ..strokeWidth = earned ? 2 : 1.5
+      ..strokeWidth = earned ? 2.r : 1.5.r
       ..color = earned
           ? Color.lerp(earnedColor, Colors.white, 0.35)!
           : AppColors.cardBorder;

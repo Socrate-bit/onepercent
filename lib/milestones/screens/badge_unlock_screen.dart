@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../theme/app_theme.dart';
 import '../models/streak_badge.dart';
@@ -23,18 +24,18 @@ class BadgeUnlockScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.all(16.r),
               child: GestureDetector(
                 onTap: () => Navigator.pop(context),
                 child: Container(
-                  width: 36,
-                  height: 36,
+                  width: 36.r,
+                  height: 36.r,
                   decoration: const BoxDecoration(
                     color: AppColors.card,
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.close,
-                      size: 18, color: AppColors.textPrimary),
+                  child: Icon(Icons.close,
+                      size: 18.r, color: AppColors.textPrimary),
                 ),
               ),
             ),
@@ -44,8 +45,8 @@ class BadgeUnlockScreen extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Container(
-                    width: 200,
-                    height: 200,
+                    width: 200.r,
+                    height: 200.r,
                     decoration: const BoxDecoration(
                       shape: BoxShape.circle,
                       gradient: RadialGradient(
@@ -55,25 +56,25 @@ class BadgeUnlockScreen extends StatelessWidget {
                     child: Center(
                       child: LargeHexagonBadge(
                         label: '${badge.requiredDays}',
-                        size: 140,
+                        size: 140.r,
                       ),
                     ),
                   ),
-                  const SizedBox(height: 32),
-                  const Text(
+                  SizedBox(height: 32.h),
+                  Text(
                     'BADGE UNLOCKED',
                     style: TextStyle(
-                      fontSize: 13,
+                      fontSize: 13.sp,
                       fontWeight: FontWeight.w800,
-                      letterSpacing: 2,
+                      letterSpacing: 2.sp,
                       color: AppColors.fire,
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12.h),
                   Text(
                     badge.name,
-                    style: const TextStyle(
-                      fontSize: 34,
+                    style: TextStyle(
+                      fontSize: 34.sp,
                       fontWeight: FontWeight.w800,
                       color: AppColors.textPrimary,
                     ),
@@ -83,23 +84,23 @@ class BadgeUnlockScreen extends StatelessWidget {
             ),
             const Spacer(),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 40),
+              padding: EdgeInsets.symmetric(horizontal: 40.w),
               child: Column(
                 children: [
                   Text(
                     'Unlocked $dateStr',
-                    style: const TextStyle(
-                      fontSize: 14,
+                    style: TextStyle(
+                      fontSize: 14.sp,
                       color: AppColors.textSecondary,
                     ),
                     textAlign: TextAlign.center,
                   ),
-                  const SizedBox(height: 8),
+                  SizedBox(height: 8.h),
                   Text(
                     badge.quote,
                     textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontSize: 14,
+                    style: TextStyle(
+                      fontSize: 14.sp,
                       fontStyle: FontStyle.italic,
                       color: AppColors.textSecondary,
                       height: 1.5,
@@ -108,7 +109,7 @@ class BadgeUnlockScreen extends StatelessWidget {
                 ],
               ),
             ),
-            const SizedBox(height: 48),
+            SizedBox(height: 48.h),
           ],
         ),
       ),

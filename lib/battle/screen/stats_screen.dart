@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../milestones/models/streak_badge.dart';
 import '../../milestones/screens/milestones_screen.dart';
@@ -25,22 +26,22 @@ class StatsScreen extends StatelessWidget {
         builder: (context, state) {
           final cubit = context.read<BattleCubit>();
           return SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
+            padding: EdgeInsets.fromLTRB(20.w, 8.h, 20.w, 24.h),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const Center(
+                Center(
                   child: Text(
                     'STATS',
                     style: TextStyle(
                       color: AppColors.textPrimary,
-                      fontSize: 18,
+                      fontSize: 18.sp,
                       fontWeight: FontWeight.w800,
-                      letterSpacing: 2,
+                      letterSpacing: 2.sp,
                     ),
                   ),
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: 16.h),
                 CurrentBadgeCard(
                   badges: evaluateStreakBadges(state.battles),
                   bestStreak: state.bestStreak,
@@ -50,25 +51,25 @@ class StatsScreen extends StatelessWidget {
                     ),
                   ),
                 ),
-                const SizedBox(height: 18),
+                SizedBox(height: 18.h),
                 _RangeSelector(
                   selected: state.range,
                   onChanged: cubit.setRange,
                 ),
-                const SizedBox(height: 18),
+                SizedBox(height: 18.h),
                 PercentileCard(
                   percentile: state.disciplinePercentile,
                   winRate: state.winRate,
                   rangeLabel: state.range.label,
                 ),
-                const SizedBox(height: 18),
+                SizedBox(height: 18.h),
                 _grid(state),
-                const SizedBox(height: 24),
+                SizedBox(height: 24.h),
                 _section('CALENDAR', CalendarHeatmap(
                   tallies: state.dayTallies,
                   days: _heatmapDays(state),
                 )),
-                const SizedBox(height: 24),
+                SizedBox(height: 24.h),
                 _section('PROGRESS OVER TIME',
                     ProgressChart(series: state.cumulativeSeries)),
               ],
@@ -134,8 +135,8 @@ class StatsScreen extends StatelessWidget {
       crossAxisCount: 2,
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      mainAxisSpacing: 14,
-      crossAxisSpacing: 14,
+      mainAxisSpacing: 14.h,
+      crossAxisSpacing: 14.w,
       childAspectRatio: 1.5,
       children: cards,
     );
@@ -144,10 +145,10 @@ class StatsScreen extends StatelessWidget {
   Widget _section(String title, Widget child) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(16.r),
       decoration: BoxDecoration(
         color: AppColors.card,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(16.r),
         border: Border.all(color: AppColors.cardBorder),
       ),
       child: Column(
@@ -155,14 +156,14 @@ class StatsScreen extends StatelessWidget {
         children: [
           Text(
             title,
-            style: const TextStyle(
+            style: TextStyle(
               color: AppColors.textSecondary,
-              fontSize: 12,
+              fontSize: 12.sp,
               fontWeight: FontWeight.w700,
-              letterSpacing: 1,
+              letterSpacing: 1.sp,
             ),
           ),
-          const SizedBox(height: 14),
+          SizedBox(height: 14.h),
           child,
         ],
       ),
@@ -179,10 +180,10 @@ class _RangeSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(4),
+      padding: EdgeInsets.all(4.r),
       decoration: BoxDecoration(
         color: AppColors.card,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(12.r),
         border: Border.all(color: AppColors.cardBorder),
       ),
       child: Row(
@@ -192,17 +193,17 @@ class _RangeSelector extends StatelessWidget {
             child: GestureDetector(
               onTap: () => onChanged(r),
               child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 9),
+                padding: EdgeInsets.symmetric(vertical: 9.h),
                 decoration: BoxDecoration(
                   color: active ? AppColors.fire : Colors.transparent,
-                  borderRadius: BorderRadius.circular(9),
+                  borderRadius: BorderRadius.circular(9.r),
                 ),
                 child: Text(
                   r.label,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: active ? Colors.white : AppColors.textSecondary,
-                    fontSize: 12,
+                    fontSize: 12.sp,
                     fontWeight: FontWeight.w700,
                   ),
                 ),

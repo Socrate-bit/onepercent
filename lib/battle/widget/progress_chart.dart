@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../theme/app_theme.dart';
 import '../cubit/battle_state.dart';
@@ -34,23 +35,23 @@ class ProgressChart extends StatelessWidget {
             if (rate != null)
               Text(
                 '${rate.toStringAsFixed(0)}% now',
-                style: const TextStyle(
+                style: TextStyle(
                   color: AppColors.textSecondary,
-                  fontSize: 12,
+                  fontSize: 12.sp,
                   fontWeight: FontWeight.w600,
                 ),
               ),
           ],
         ),
-        const SizedBox(height: 12),
+        SizedBox(height: 12.h),
         SizedBox(
-          height: 160,
+          height: 160.h,
           width: double.infinity,
           child: series.isEmpty
-              ? const Center(
+              ? Center(
                   child: Text(
                     'Not enough data yet',
-                    style: TextStyle(color: AppColors.textSecondary, fontSize: 13),
+                    style: TextStyle(color: AppColors.textSecondary, fontSize: 13.sp),
                   ),
                 )
               : CustomPaint(painter: _ChartPainter(series)),
@@ -62,10 +63,10 @@ class ProgressChart extends StatelessWidget {
   Widget _legend(Color c, String label) {
     return Row(
       children: [
-        Container(width: 12, height: 3, color: c),
-        const SizedBox(width: 6),
+        Container(width: 12.w, height: 3.h, color: c),
+        SizedBox(width: 6.w),
         Text(label,
-            style: const TextStyle(color: AppColors.textSecondary, fontSize: 12)),
+            style: TextStyle(color: AppColors.textSecondary, fontSize: 12.sp)),
       ],
     );
   }
@@ -85,8 +86,8 @@ class _ChartPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    const leftPad = 34.0;
-    const bottomPad = 4.0;
+    final leftPad = 34.w;
+    final bottomPad = 4.h;
     final chartW = size.width - leftPad;
     final chartH = size.height - bottomPad;
 
@@ -97,7 +98,7 @@ class _ChartPainter extends CustomPainter {
     for (var i = 0; i <= 2; i++) {
       final y = chartH - chartH * (i / 2);
       canvas.drawLine(Offset(leftPad, y), Offset(size.width, y), gridPaint);
-      _label(canvas, '${(100 * i / 2).round()}%', Offset(0, y - 6));
+      _label(canvas, '${(100 * i / 2).round()}%', Offset(0, y - 6.h));
     }
 
     Offset pointAt(int index) {
@@ -137,7 +138,7 @@ class _ChartPainter extends CustomPainter {
       path,
       Paint()
         ..style = PaintingStyle.stroke
-        ..strokeWidth = 2.5
+        ..strokeWidth = 2.5.r
         ..strokeCap = StrokeCap.round
         ..strokeJoin = StrokeJoin.round
         ..color = AppColors.win,
@@ -146,7 +147,7 @@ class _ChartPainter extends CustomPainter {
     // Dot markers so a lone point (or endpoints) is always visible.
     final dot = Paint()..color = AppColors.win;
     for (final p in points) {
-      canvas.drawCircle(p, 3, dot);
+      canvas.drawCircle(p, 3.r, dot);
     }
   }
 
@@ -154,7 +155,7 @@ class _ChartPainter extends CustomPainter {
     final tp = TextPainter(
       text: TextSpan(
         text: text,
-        style: const TextStyle(color: AppColors.textSecondary, fontSize: 10),
+        style: TextStyle(color: AppColors.textSecondary, fontSize: 10.sp),
       ),
       textDirection: TextDirection.ltr,
     )..layout();

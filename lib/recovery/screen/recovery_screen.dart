@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../battle/cubit/battle_cubit.dart';
 import '../../battle/models/battle.dart';
@@ -110,7 +111,7 @@ class _RecoveryScreenState extends State<RecoveryScreen> {
                 return CustomScrollView(
                   slivers: [
                     SliverPadding(
-                      padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
+                      padding: EdgeInsets.fromLTRB(20.w, 8.h, 20.w, 16.h),
                       sliver: SliverToBoxAdapter(
                         child: _Header(
                           state: state,
@@ -130,10 +131,10 @@ class _RecoveryScreenState extends State<RecoveryScreen> {
                       )
                     else
                       SliverPadding(
-                        padding: const EdgeInsets.fromLTRB(20, 0, 20, 96),
+                        padding: EdgeInsets.fromLTRB(20.w, 0, 20.w, 96.h),
                         sliver: SliverList.separated(
                           itemCount: state.tasks.length,
-                          separatorBuilder: (_, _) => const SizedBox(height: 10),
+                          separatorBuilder: (_, _) => SizedBox(height: 10.h),
                           itemBuilder: (_, i) => _TaskRow(task: state.tasks[i]),
                         ),
                       ),
@@ -180,26 +181,26 @@ class _Header extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        const Text(
+        Text(
           'RECOVERY MODE',
           style: TextStyle(
             color: AppColors.textPrimary,
-            fontSize: 18,
+            fontSize: 18.sp,
             fontWeight: FontWeight.w800,
-            letterSpacing: 2,
+            letterSpacing: 2.sp,
           ),
         ),
-        const SizedBox(height: 2),
-        const Text(
+        SizedBox(height: 2.h),
+        Text(
           'Small steps to build back on track and build momentum',
           textAlign: TextAlign.center,
-          style: TextStyle(color: AppColors.textSecondary, fontSize: 13),
+          style: TextStyle(color: AppColors.textSecondary, fontSize: 13.sp),
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: 16.h),
         Row(
           children: [
             Expanded(child: _Counter(done: state.doneCount, total: state.total)),
-            const SizedBox(width: 12),
+            SizedBox(width: 12.w),
             _RecoverButton(enabled: state.allDone, onTap: onRecover),
           ],
         ),
@@ -220,21 +221,21 @@ class _RecoverButton extends StatelessWidget {
     return FilledButton.icon(
       onPressed: enabled ? onTap : null,
       icon: Icon(enabled ? Icons.emoji_events_rounded : Icons.lock_rounded,
-          size: 18),
+          size: 18.r),
       label: const Text('RECOVER'),
       style: FilledButton.styleFrom(
         backgroundColor: AppColors.win,
         foregroundColor: Colors.white,
         disabledBackgroundColor: AppColors.card,
         disabledForegroundColor: AppColors.textSecondary,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-        textStyle: const TextStyle(
-          fontSize: 13,
+        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+        textStyle: TextStyle(
+          fontSize: 13.sp,
           fontWeight: FontWeight.w800,
-          letterSpacing: 0.5,
+          letterSpacing: 0.5.sp,
         ),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(14.r),
           side: enabled
               ? BorderSide.none
               : const BorderSide(color: AppColors.cardBorder),
@@ -257,10 +258,10 @@ class _Counter extends StatelessWidget {
     final progress = total == 0 ? 0.0 : done / total;
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
       decoration: BoxDecoration(
         color: AppColors.card,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(14.r),
         border: Border.all(color: AppColors.cardBorder),
       ),
       child: Row(
@@ -272,41 +273,41 @@ class _Counter extends StatelessWidget {
                   text: '$done',
                   style: TextStyle(
                     color: accent,
-                    fontSize: 22,
+                    fontSize: 22.sp,
                     fontWeight: FontWeight.w800,
                   ),
                 ),
                 TextSpan(
                   text: ' / $total',
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: AppColors.textSecondary,
-                    fontSize: 16,
+                    fontSize: 16.sp,
                     fontWeight: FontWeight.w800,
                   ),
                 ),
               ],
             ),
           ),
-          const SizedBox(width: 14),
+          SizedBox(width: 14.w),
           Expanded(
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(4),
+              borderRadius: BorderRadius.circular(4.r),
               child: LinearProgressIndicator(
                 value: progress,
-                minHeight: 6,
+                minHeight: 6.h,
                 backgroundColor: AppColors.background,
                 valueColor: AlwaysStoppedAnimation<Color>(accent),
               ),
             ),
           ),
-          const SizedBox(width: 12),
+          SizedBox(width: 12.w),
           Text(
             complete ? 'All done' : 'done',
             style: TextStyle(
               color: complete ? AppColors.win : AppColors.textSecondary,
-              fontSize: 12,
+              fontSize: 12.sp,
               fontWeight: complete ? FontWeight.w700 : FontWeight.w400,
-              letterSpacing: 0.5,
+              letterSpacing: 0.5.sp,
             ),
           ),
         ],
@@ -330,14 +331,14 @@ class _TaskRow extends StatelessWidget {
 
     return Material(
       color: AppColors.card,
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(16.r),
       child: InkWell(
         onTap: () => cubit.toggle(task.id, !done),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(16.r),
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(16.r),
             border: Border.all(color: AppColors.cardBorder),
           ),
           child: Row(
@@ -347,15 +348,15 @@ class _TaskRow extends StatelessWidget {
                     ? Icons.check_circle_rounded
                     : Icons.radio_button_unchecked_rounded,
                 color: done ? accent : AppColors.textSecondary,
-                size: 26,
+                size: 26.r,
               ),
-              const SizedBox(width: 14),
+              SizedBox(width: 14.w),
               Expanded(
                 child: Text(
                   task.title,
                   style: TextStyle(
                     color: done ? AppColors.textSecondary : AppColors.textPrimary,
-                    fontSize: 15,
+                    fontSize: 15.sp,
                     fontWeight: FontWeight.w600,
                     decoration: done ? TextDecoration.lineThrough : null,
                     decorationColor: AppColors.textSecondary,
@@ -370,7 +371,7 @@ class _TaskRow extends StatelessWidget {
                       : Icons.bookmark_border_rounded,
                 ),
                 color: bookmarked ? AppColors.fire : AppColors.textSecondary,
-                splashRadius: 22,
+                splashRadius: 22.r,
                 tooltip: bookmarked
                     ? 'Remove from quick add'
                     : 'Save to quick add',
@@ -379,7 +380,7 @@ class _TaskRow extends StatelessWidget {
                 onPressed: () => cubit.deleteTask(task.id),
                 icon: const Icon(Icons.delete_outline_rounded),
                 color: AppColors.textSecondary,
-                splashRadius: 22,
+                splashRadius: 22.r,
                 tooltip: 'Delete task',
               ),
             ],
@@ -395,26 +396,27 @@ class _EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.all(32),
+    return Padding(
+      padding: EdgeInsets.all(32.r),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.healing_rounded, color: AppColors.textSecondary, size: 48),
-          SizedBox(height: 12),
+          Icon(Icons.healing_rounded,
+              color: AppColors.textSecondary, size: 48.r),
+          SizedBox(height: 12.h),
           Text(
             'No recovery tasks yet',
             style: TextStyle(
               color: AppColors.textPrimary,
-              fontSize: 16,
+              fontSize: 16.sp,
               fontWeight: FontWeight.w700,
             ),
           ),
-          SizedBox(height: 4),
+          SizedBox(height: 4.h),
           Text(
             'Tap + to line up a few small steps.',
             textAlign: TextAlign.center,
-            style: TextStyle(color: AppColors.textSecondary, fontSize: 13),
+            style: TextStyle(color: AppColors.textSecondary, fontSize: 13.sp),
           ),
         ],
       ),
