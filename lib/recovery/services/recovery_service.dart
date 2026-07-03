@@ -3,6 +3,16 @@ import 'package:flutter/foundation.dart';
 
 import '../models/recovery_task.dart';
 
+/// Built-in quick-add suggestions, always available in the add-task sheet.
+/// Users can grow this list by bookmarking their own tasks (stored per-user).
+const List<String> kDefaultRecoveryPresets = [
+  'Clean the dish',
+  'Clean your room',
+  'Take a shower',
+  'Go for a 20min walk',
+  'Do sport',
+];
+
 /// Firestore access for recovery tasks, stored at
 /// `users/{uid}/recovery_tasks/{autoId}`.
 ///
@@ -14,6 +24,55 @@ class RecoveryService {
 
   CollectionReference<Map<String, dynamic>> _tasks(String uid) =>
       _db.collection('users').doc(uid).collection('recovery_tasks');
+
+  CollectionReference<Map<String, dynamic>> _presets(String uid) =>
+      _db.collection('users').doc(uid).collection('recovery_presets');
+
+  /// Streams the user's bookmarked quick-add presets, oldest first.
+  Stream<List<String>> watchPresets(String uid) {
+    return _presets(uid).orderBy('createdAt').snapshots().map(
+          (snap) => snap.docs
+              .map((d) => d.data()['title'] as String? ?? '')
+              .where((t) => t.isNotEmpty)
+              .toList(),
+        );
+  }
+
+  /// Bookmarks [title] as a preset. No-op for blanks or duplicates.
+  Future<void> addPreset(String uid, String title) async {
+    final trimmed = title.trim();
+    if (trimmed.isEmpty) return;
+    try {
+      final existing =
+          await _presets(uid).where('title', isEqualTo: trimmed).limit(1).get();
+      if (existing.docs.isNotEmpty) return;
+      await _presets(uid).add({
+        'title': trimmed,
+        'createdAt': DateTime.now().millisecondsSinceEpoch,
+      });
+    } catch (e, st) {
+      debugPrint('[RecoveryService] addPreset failed: $e\n$st');
+      rethrow;
+    }
+  }
+
+  /// Removes any preset matching [title]. No-op if none exist.
+  Future<void> removePreset(String uid, String title) async {
+    final trimmed = title.trim();
+    if (trimmed.isEmpty) return;
+    try {
+      final matches =
+          await _presets(uid).where('title', isEqualTo: trimmed).get();
+      final batch = _db.batch();
+      for (final doc in matches.docs) {
+        batch.delete(doc.reference);
+      }
+      await batch.commit();
+    } catch (e, st) {
+      debugPrint('[RecoveryService] removePreset failed: $e\n$st');
+      rethrow;
+    }
+  }
 
   /// Streams all recovery tasks for [uid], oldest first.
   Stream<List<RecoveryTask>> watchTasks(String uid) {

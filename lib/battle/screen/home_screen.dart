@@ -1,10 +1,17 @@
+import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../breathing/breathing_screen.dart';
+import '../../milestones/models/streak_badge.dart';
+import '../../milestones/screens/milestones_screen.dart';
+import '../../milestones/widget/current_badge_card.dart';
+import '../../recovery/cubit/recovery_cubit.dart';
+import '../../recovery/screen/recovery_screen.dart';
 import '../../theme/app_theme.dart';
 import '../cubit/battle_cubit.dart';
 import '../cubit/battle_state.dart';
@@ -30,8 +37,24 @@ class _HomeScreenState extends State<HomeScreen> {
   late final ConfettiController _confetti =
       ConfettiController(duration: const Duration(milliseconds: 600));
 
+  /// Ticks every minute so the time-gated Validate Day button (unlocks at
+  /// 9 PM) refreshes without needing another state change.
+  Timer? _clockTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    _clockTimer = Timer.periodic(
+      const Duration(minutes: 1),
+      (_) {
+        if (mounted) setState(() {});
+      },
+    );
+  }
+
   @override
   void dispose() {
+    _clockTimer?.cancel();
     _confetti.dispose();
     super.dispose();
   }
@@ -50,8 +73,58 @@ class _HomeScreenState extends State<HomeScreen> {
       cubit.recordLoss(difficulty: entry.difficulty, name: entry.name);
       if (entry.breathe && mounted) {
         await _startBreathing(context);
+      } else if (entry.recover && mounted) {
+        _openRecovery(context, openAddOnStart: true);
       }
     }
+  }
+
+  /// Opens the Recovery checklist as a full screen, forwarding the ambient
+  /// cubits. [openAddOnStart] pops the add-task dialog on entry when the
+  /// checklist is empty — set both from a loss and the Recovery shortcut.
+  void _openRecovery(BuildContext context, {bool openAddOnStart = false}) {
+    final battleCubit = context.read<BattleCubit>();
+    final recoveryCubit = context.read<RecoveryCubit>();
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => MultiBlocProvider(
+          providers: [
+            BlocProvider.value(value: battleCubit),
+            BlocProvider.value(value: recoveryCubit),
+          ],
+          child: Scaffold(
+            appBar: AppBar(
+              backgroundColor: AppColors.background,
+              title: const Text('Recovery'),
+            ),
+            body: RecoveryScreen(openAddOnStart: openAddOnStart),
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Day validation opens at 9 PM (once the day is basically done) and locks
+  /// again once used, so it can only happen once per day.
+  static const int _validateHour = 21;
+
+  bool _canValidateDay(BattleState state) =>
+      DateTime.now().hour >= _validateHour && !state.validatedToday;
+
+  /// Reason the button is locked, or null when it's tappable.
+  String? _validateLockReason(BattleState state) {
+    if (state.validatedToday) return 'Already validated today';
+    if (DateTime.now().hour < _validateHour) return 'Unlocks at 9:00 PM';
+    return null;
+  }
+
+  /// Quick "no loss today" action: logs a win and celebrates, no dialog.
+  void _validateDay() {
+    context.read<BattleCubit>().recordWin(
+          name: 'Day validated',
+          source: BattleSource.validated,
+        );
+    _confetti.play();
   }
 
   Future<void> _startBreathing(BuildContext context) async {
@@ -85,6 +158,17 @@ class _HomeScreenState extends State<HomeScreen> {
                     const SizedBox(height: 24),
                     Center(child: StreakRing(streak: state.currentStreak)),
                     const SizedBox(height: 24),
+                    CurrentBadgeCard(
+                      badges: evaluateStreakBadges(state.battles),
+                      bestStreak: state.bestStreak,
+                      onTap: () => Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) =>
+                              MilestonesScreen(battles: state.battles),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 14),
                     Row(
                       children: [
                         Expanded(
@@ -106,7 +190,9 @@ class _HomeScreenState extends State<HomeScreen> {
                             label: 'WIN % THIS WEEK',
                             value:
                                 '${state.winRateThisWeek.toStringAsFixed(0)}%',
-                            caption: '${state.battlesThisWeek} battles',
+                            caption:
+                                '${state.winsThisWeek} ${state.winsThisWeek == 1 ? 'win' : 'wins'} · '
+                                '${state.lossesThisWeek} ${state.lossesThisWeek == 1 ? 'loss' : 'losses'}',
                           ),
                         ),
                       ],
@@ -116,9 +202,27 @@ class _HomeScreenState extends State<HomeScreen> {
                       onWin: () => _record(BattleOutcome.win),
                       onLoss: () => _record(BattleOutcome.loss),
                     ),
+                    const SizedBox(height: 14),
+                    _ValidateDayButton(
+                      enabled: _canValidateDay(state),
+                      lockedReason: _validateLockReason(state),
+                      onTap: _validateDay,
+                    ),
                     const SizedBox(height: 16),
-                    _BreatheButton(
+                    _ActionButton(
+                      icon: Icons.air_rounded,
+                      iconColor: const Color(0xFF5AA9FF),
+                      title: 'BREATHE',
+                      subtitle: 'Pause. Reset. Refocus.',
                       onTap: () => _startBreathing(context),
+                    ),
+                    const SizedBox(height: 12),
+                    _ActionButton(
+                      icon: Icons.healing_rounded,
+                      iconColor: AppColors.win,
+                      title: 'RECOVERY',
+                      subtitle: 'Small steps to take back momentum.',
+                      onTap: () => _openRecovery(context, openAddOnStart: true),
                     ),
                     const SizedBox(height: 24),
                     const _Quote(
@@ -171,7 +275,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               SizedBox(height: 2),
               Text(
-                'Choose your future',
+                'Master your mind, choose your future',
                 style: TextStyle(color: AppColors.textSecondary, fontSize: 13),
               ),
             ],
@@ -182,9 +286,22 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-class _BreatheButton extends StatelessWidget {
+/// A tappable card row with a leading icon, title, subtitle, and chevron —
+/// used for the Breathe and Recovery shortcuts under the Win/Loss buttons.
+class _ActionButton extends StatelessWidget {
+  final IconData icon;
+  final Color iconColor;
+  final String title;
+  final String subtitle;
   final VoidCallback onTap;
-  const _BreatheButton({required this.onTap});
+
+  const _ActionButton({
+    required this.icon,
+    required this.iconColor,
+    required this.title,
+    required this.subtitle,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -202,32 +319,111 @@ class _BreatheButton extends StatelessWidget {
           ),
           child: Row(
             children: [
-              const Icon(Icons.air_rounded, color: Color(0xFF5AA9FF), size: 24),
+              Icon(icon, color: iconColor, size: 24),
               const SizedBox(width: 14),
-              const Expanded(
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'BREATHE',
-                      style: TextStyle(
+                      title,
+                      style: const TextStyle(
                         color: AppColors.textPrimary,
                         fontSize: 15,
                         fontWeight: FontWeight.w800,
                         letterSpacing: 1,
                       ),
                     ),
-                    SizedBox(height: 2),
+                    const SizedBox(height: 2),
                     Text(
-                      'Pause. Reset. Refocus.',
-                      style:
-                          TextStyle(color: AppColors.textSecondary, fontSize: 12),
+                      subtitle,
+                      style: const TextStyle(
+                          color: AppColors.textSecondary, fontSize: 12),
                     ),
                   ],
                 ),
               ),
               const Icon(Icons.chevron_right_rounded,
                   color: AppColors.textSecondary),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Full-width "no loss today" shortcut that logs a win in one tap. Opens only
+/// after 9 PM and locks once the day is validated; [lockedReason] explains why
+/// it's disabled. Styled green when live, greyed out when locked.
+class _ValidateDayButton extends StatelessWidget {
+  final bool enabled;
+  final String? lockedReason;
+  final VoidCallback onTap;
+  const _ValidateDayButton({
+    required this.enabled,
+    required this.lockedReason,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final accent = enabled ? AppColors.win : AppColors.textSecondary;
+    return Material(
+      color: enabled
+          ? AppColors.win.withValues(alpha: 0.14)
+          : AppColors.card,
+      borderRadius: BorderRadius.circular(16),
+      child: InkWell(
+        onTap: enabled
+            ? () {
+                HapticFeedback.mediumImpact();
+                onTap();
+              }
+            : null,
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: enabled
+                  ? AppColors.win.withValues(alpha: 0.5)
+                  : AppColors.cardBorder,
+            ),
+          ),
+          child: Row(
+            children: [
+              Icon(
+                enabled ? Icons.verified_rounded : Icons.lock_rounded,
+                color: accent,
+                size: 24,
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'VALIDATE DAY',
+                      style: TextStyle(
+                        color: accent,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 1,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      lockedReason ?? 'No loss today — log a win',
+                      style: const TextStyle(
+                          color: AppColors.textSecondary, fontSize: 12),
+                    ),
+                  ],
+                ),
+              ),
+              if (enabled)
+                const Icon(Icons.chevron_right_rounded, color: AppColors.win),
             ],
           ),
         ),

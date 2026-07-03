@@ -94,6 +94,17 @@ class BattleState extends Equatable {
   /// Lifetime total wins (not windowed) — shown on Home.
   int get totalWinsAllTime => battles.where((b) => b.isWin).length;
 
+  /// Whether the day has already been validated today (a validated-source win
+  /// logged on the current calendar day). Drives the Validate Day lock.
+  bool get validatedToday {
+    final now = DateTime.now();
+    return battles.any((b) =>
+        b.source == BattleSource.validated &&
+        b.ts.year == now.year &&
+        b.ts.month == now.month &&
+        b.ts.day == now.day);
+  }
+
   // --- This week (last 7 days) --------------------------------------------
 
   /// Battles recorded in the last 7 days (today included).
@@ -104,6 +115,12 @@ class BattleState extends Equatable {
 
   /// Number of battles fought this week.
   int get battlesThisWeek => _thisWeekBattles.length;
+
+  /// Wins recorded this week.
+  int get winsThisWeek => _thisWeekBattles.where((b) => b.isWin).length;
+
+  /// Losses recorded this week.
+  int get lossesThisWeek => _thisWeekBattles.where((b) => b.isLoss).length;
 
   /// Win rate this week as a percentage (0 when no battles this week).
   double get winRateThisWeek {

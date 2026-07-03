@@ -32,18 +32,23 @@ class BattleCubit extends Cubit<BattleState> {
 
   /// Records a disciplined win. Firestore's local cache updates the stream
   /// optimistically, so the UI reflects it immediately.
-  Future<void> recordWin({int difficulty = 0, String name = ''}) =>
-      _record(BattleOutcome.win, difficulty, name);
+  Future<void> recordWin({
+    int difficulty = 0,
+    String name = '',
+    BattleSource source = BattleSource.normal,
+  }) =>
+      _record(BattleOutcome.win, difficulty, name, source);
 
   /// Records a loss (breaks the current day's streak on the next emission).
   Future<void> recordLoss({int difficulty = 0, String name = ''}) =>
-      _record(BattleOutcome.loss, difficulty, name);
+      _record(BattleOutcome.loss, difficulty, name, BattleSource.normal);
 
   Future<void> _record(
-      BattleOutcome outcome, int difficulty, String name) async {
+      BattleOutcome outcome, int difficulty, String name,
+      BattleSource source) async {
     try {
       await _service.addBattle(uid, outcome,
-          difficulty: difficulty, name: name);
+          difficulty: difficulty, name: name, source: source);
     } catch (e) {
       emit(state.copyWith(error: 'Could not save. Check your connection.'));
     }

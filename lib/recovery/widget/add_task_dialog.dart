@@ -3,18 +3,23 @@ import 'package:flutter/material.dart';
 import '../../theme/app_theme.dart';
 
 /// Presents a modal bottom sheet to add a recovery task. Returns the trimmed
-/// title, or `null` if the user dismisses without confirming.
-Future<String?> showAddTaskDialog(BuildContext context) {
+/// title, or `null` if the user dismisses without confirming. Tapping one of
+/// the [presets] chips returns that title immediately.
+Future<String?> showAddTaskDialog(
+  BuildContext context, {
+  List<String> presets = const [],
+}) {
   return showModalBottomSheet<String>(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
-    builder: (_) => const _AddTaskSheet(),
+    builder: (_) => _AddTaskSheet(presets: presets),
   );
 }
 
 class _AddTaskSheet extends StatefulWidget {
-  const _AddTaskSheet();
+  final List<String> presets;
+  const _AddTaskSheet({required this.presets});
 
   @override
   State<_AddTaskSheet> createState() => _AddTaskSheetState();
@@ -90,7 +95,6 @@ class _AddTaskSheetState extends State<_AddTaskSheet> {
             const SizedBox(height: 20),
             TextField(
               controller: _controller,
-              autofocus: true,
               textCapitalization: TextCapitalization.sentences,
               textInputAction: TextInputAction.done,
               onSubmitted: (_) => _submit(),
@@ -113,6 +117,33 @@ class _AddTaskSheetState extends State<_AddTaskSheet> {
                 ),
               ),
             ),
+            if (widget.presets.isNotEmpty) ...[
+              const SizedBox(height: 18),
+              const Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'QUICK ADD',
+                  style: TextStyle(
+                    color: AppColors.textSecondary,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 1.5,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  for (final preset in widget.presets)
+                    _PresetChip(
+                      label: preset,
+                      onTap: () => Navigator.of(context).pop(preset),
+                    ),
+                ],
+              ),
+            ],
             const SizedBox(height: 16),
             Row(
               children: [
@@ -149,6 +180,48 @@ class _AddTaskSheetState extends State<_AddTaskSheet> {
               ],
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+/// A tappable suggestion chip that adds its [label] as a task on tap.
+class _PresetChip extends StatelessWidget {
+  final String label;
+  final VoidCallback onTap;
+  const _PresetChip({required this.label, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: AppColors.background,
+      borderRadius: BorderRadius.circular(20),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(20),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: AppColors.cardBorder),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.add_rounded,
+                  size: 16, color: AppColors.fire),
+              const SizedBox(width: 6),
+              Text(
+                label,
+                style: const TextStyle(
+                  color: AppColors.textPrimary,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

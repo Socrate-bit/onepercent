@@ -10,6 +10,20 @@ enum BattleOutcome {
       value == 'loss' ? BattleOutcome.loss : BattleOutcome.win;
 }
 
+/// Where a battle came from: a normal win/loss, a whole-day validation, or a
+/// win logged from the Recovery checklist.
+enum BattleSource {
+  normal,
+  validated,
+  recovery;
+
+  static BattleSource fromName(String? value) => switch (value) {
+        'validated' => BattleSource.validated,
+        'recovery' => BattleSource.recovery,
+        _ => BattleSource.normal,
+      };
+}
+
 /// A single recorded decision: a win (resisted / disciplined) or a loss
 /// (gave in), stamped with the moment it happened.
 class Battle extends Equatable {
@@ -23,12 +37,16 @@ class Battle extends Equatable {
   /// Optional label for what the decision was (empty if not captured).
   final String name;
 
+  /// How this battle was logged (normal, day validation, or recovery).
+  final BattleSource source;
+
   const Battle({
     required this.id,
     required this.outcome,
     required this.ts,
     this.difficulty = 0,
     this.name = '',
+    this.source = BattleSource.normal,
   });
 
   bool get isWin => outcome == BattleOutcome.win;
@@ -45,6 +63,7 @@ class Battle extends Equatable {
       ),
       difficulty: (data['difficulty'] as num?)?.toInt() ?? 0,
       name: data['name'] as String? ?? '',
+      source: BattleSource.fromName(data['source'] as String?),
     );
   }
 
@@ -54,8 +73,9 @@ class Battle extends Equatable {
         'ts': ts.millisecondsSinceEpoch,
         'difficulty': difficulty,
         'name': name,
+        'source': source.name,
       };
 
   @override
-  List<Object?> get props => [id, outcome, ts, difficulty, name];
+  List<Object?> get props => [id, outcome, ts, difficulty, name, source];
 }

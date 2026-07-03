@@ -19,7 +19,12 @@ import '../widget/add_task_dialog.dart';
 /// task is checked, the Recover button unlocks: it logs a win, then clears the
 /// checklist so the next slump starts clean.
 class RecoveryScreen extends StatefulWidget {
-  const RecoveryScreen({super.key});
+  /// When true, the add-task sheet opens automatically once the screen is
+  /// shown — but only if there are no tasks yet. Used when arriving here
+  /// straight from logging a loss so an empty checklist isn't left blank.
+  final bool openAddOnStart;
+
+  const RecoveryScreen({super.key, this.openAddOnStart = false});
 
   @override
   State<RecoveryScreen> createState() => _RecoveryScreenState();
@@ -27,7 +32,19 @@ class RecoveryScreen extends StatefulWidget {
 
 class _RecoveryScreenState extends State<RecoveryScreen> {
   late final ConfettiController _confetti =
-      ConfettiController(duration: const Duration(seconds: 1));
+      ConfettiController(duration: const Duration(milliseconds: 600));
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.openAddOnStart) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && context.read<RecoveryCubit>().state.tasks.isEmpty) {
+          _add(context);
+        }
+      });
+    }
+  }
 
   @override
   void dispose() {
@@ -37,7 +54,10 @@ class _RecoveryScreenState extends State<RecoveryScreen> {
 
   Future<void> _add(BuildContext context) async {
     final cubit = context.read<RecoveryCubit>();
-    final title = await showAddTaskDialog(context);
+    final title = await showAddTaskDialog(
+      context,
+      presets: cubit.state.presets,
+    );
     if (title == null) return;
     cubit.addTask(title);
   }
@@ -50,7 +70,11 @@ class _RecoveryScreenState extends State<RecoveryScreen> {
     final battle = context.read<BattleCubit>();
     final entry = await showDifficultyDialog(context, BattleOutcome.win);
     if (entry == null) return;
-    await battle.recordWin(difficulty: entry.difficulty, name: entry.name);
+    await battle.recordWin(
+      difficulty: entry.difficulty,
+      name: entry.name,
+      source: BattleSource.recovery,
+    );
     _confetti.play();
     await recovery.clearTasks();
   }
@@ -116,18 +140,20 @@ class _RecoveryScreenState extends State<RecoveryScreen> {
               alignment: Alignment.topCenter,
               child: ConfettiWidget(
                 confettiController: _confetti,
-                blastDirection: math.pi / 2, // straight down
-                emissionFrequency: 0.05,
-                numberOfParticles: 24,
-                maxBlastForce: 22,
-                minBlastForce: 8,
-                gravity: 0.25,
+                blastDirection: math.pi / 2,
+                blastDirectionality: BlastDirectionality.explosive,
+                emissionFrequency: 0.9,
+                numberOfParticles: 18,
+                maxBlastForce: 50,
+                minBlastForce: 30,
+                gravity: 0.45,
                 shouldLoop: false,
                 colors: const [
-                  AppColors.win,
-                  AppColors.fire,
-                  Color(0xFF5AA9FF),
-                  Colors.white,
+                  Color(0xFF6D28D9), // purpleDeep
+                  AppColors.fire, // orange
+                  Colors.amber,
+                  Colors.greenAccent,
+                  Colors.lightBlueAccent,
                 ],
               ),
             ),
@@ -293,6 +319,9 @@ class _TaskRow extends StatelessWidget {
     final cubit = context.read<RecoveryCubit>();
     final done = task.done;
     final accent = done ? AppColors.win : AppColors.fire;
+    final bookmarked = context.select<RecoveryCubit, bool>(
+      (c) => c.state.customPresets.contains(task.title.trim()),
+    );
 
     return Material(
       color: AppColors.card,
@@ -327,6 +356,19 @@ class _TaskRow extends StatelessWidget {
                     decorationColor: AppColors.textSecondary,
                   ),
                 ),
+              ),
+              IconButton(
+                onPressed: () => cubit.toggleBookmark(task.title),
+                icon: Icon(
+                  bookmarked
+                      ? Icons.bookmark_rounded
+                      : Icons.bookmark_border_rounded,
+                ),
+                color: bookmarked ? AppColors.fire : AppColors.textSecondary,
+                splashRadius: 22,
+                tooltip: bookmarked
+                    ? 'Remove from quick add'
+                    : 'Save to quick add',
               ),
               IconButton(
                 onPressed: () => cubit.deleteTask(task.id),

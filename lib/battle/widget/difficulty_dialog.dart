@@ -4,8 +4,14 @@ import '../../theme/app_theme.dart';
 import '../models/battle.dart';
 
 /// The outcome of the difficulty sheet: how hard it felt, an optional name
-/// describing the decision, and whether the user asked to breathe afterwards.
-typedef DifficultyResult = ({int difficulty, String name, bool breathe});
+/// describing the decision, whether the user asked to breathe afterwards, and
+/// whether they want to jump straight into Recovery mode.
+typedef DifficultyResult = ({
+  int difficulty,
+  String name,
+  bool breathe,
+  bool recover,
+});
 
 /// Presents a modal bottom sheet asking how hard the decision felt on a 0–10
 /// scale (plus an optional decision name) before the outcome is committed.
@@ -41,12 +47,13 @@ class _DifficultySheetState extends State<_DifficultySheet> {
     super.dispose();
   }
 
-  void _submit({bool breathe = false}) {
+  void _submit({bool breathe = false, bool recover = false}) {
     Navigator.of(context).pop(
       (
         difficulty: _value.round(),
         name: _nameController.text.trim(),
         breathe: breathe,
+        recover: recover,
       ),
     );
   }
@@ -68,6 +75,8 @@ class _DifficultySheetState extends State<_DifficultySheet> {
           _question('What is the little step you feel to do?'),
           const SizedBox(height: 16),
           _BreatheButton(onTap: () => _submit(breathe: true)),
+          const SizedBox(height: 10),
+          _RecoveryButton(onTap: () => _submit(recover: true)),
         ],
       ),
     );
@@ -286,6 +295,45 @@ class _BreatheButton extends StatelessWidget {
                 ),
               ),
               const Icon(Icons.chevron_right_rounded, color: _breathe),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// A "Go to Recovery mode" call-to-action shown inside the loss reflection
+/// block, below the breathe shortcut.
+class _RecoveryButton extends StatelessWidget {
+  final VoidCallback onTap;
+  const _RecoveryButton({required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: AppColors.win.withValues(alpha: 0.14),
+      borderRadius: BorderRadius.circular(14),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(14),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          child: Row(
+            children: [
+              const Icon(Icons.healing_rounded, color: AppColors.win, size: 22),
+              const SizedBox(width: 12),
+              const Expanded(
+                child: Text(
+                  'Go to Recovery mode',
+                  style: TextStyle(
+                    color: AppColors.win,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ),
+              const Icon(Icons.chevron_right_rounded, color: AppColors.win),
             ],
           ),
         ),

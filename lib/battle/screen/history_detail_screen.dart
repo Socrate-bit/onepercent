@@ -59,6 +59,24 @@ class HistoryDetailScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 16),
+              if (battle.source != BattleSource.normal) ...[
+                Builder(builder: (context) {
+                  final badge = sourceBadge(battle.source);
+                  return _InfoTile(
+                    icon: badge.icon,
+                    label: 'TYPE',
+                    child: Text(
+                      badge.label,
+                      style: const TextStyle(
+                        color: AppColors.win,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  );
+                }),
+                const SizedBox(height: 12),
+              ],
               _InfoTile(
                 icon: Icons.event_rounded,
                 label: 'WHEN',

@@ -34,10 +34,16 @@ List<DayOutcome> dailyOutcomes(List<Battle> battles) {
   ];
 }
 
-/// Consecutive clean days up to the most recent active day (0 when that day
-/// had a loss). Frozen days between clean days do not break the run.
-int dailyCurrentStreak(List<Battle> battles) {
-  final days = dailyOutcomes(battles);
+/// Consecutive clean days up to the most recent *completed* active day (0 when
+/// that day had a loss). Today is never counted — a day only becomes valid once
+/// it is over — so the streak reflects yesterday and earlier. Frozen days
+/// between clean days do not break the run.
+int dailyCurrentStreak(List<Battle> battles, {DateTime? now}) {
+  final current = now ?? DateTime.now();
+  final today = DateTime(current.year, current.month, current.day);
+  final days = dailyOutcomes(battles)
+      .where((d) => d.day.isBefore(today))
+      .toList();
   var streak = 0;
   for (var i = days.length - 1; i >= 0; i--) {
     if (days[i].hasLoss) break;

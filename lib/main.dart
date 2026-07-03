@@ -12,7 +12,6 @@ import 'battle/screen/stats_screen.dart';
 import 'battle/services/battle_service.dart';
 import 'firebase_options.dart';
 import 'recovery/cubit/recovery_cubit.dart';
-import 'recovery/screen/recovery_screen.dart';
 import 'recovery/services/recovery_service.dart';
 import 'theme/app_theme.dart';
 
@@ -93,7 +92,7 @@ class _Centered extends StatelessWidget {
       Scaffold(body: Center(child: child));
 }
 
-/// Bottom-nav shell hosting the tabs: Today, Recovery, History, and Stats.
+/// Bottom-nav shell hosting the tabs: Today, History, and Stats.
 class HomeShell extends StatefulWidget {
   const HomeShell({super.key});
 
@@ -106,7 +105,6 @@ class _HomeShellState extends State<HomeShell> {
 
   static const _tabs = [
     HomeScreen(),
-    RecoveryScreen(),
     HistoryScreen(),
     StatsScreen(),
   ];
@@ -125,11 +123,6 @@ class _HomeShellState extends State<HomeShell> {
             icon: Icon(Icons.today_outlined),
             selectedIcon: Icon(Icons.today, color: AppColors.fire),
             label: 'Today',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.healing_outlined),
-            selectedIcon: Icon(Icons.healing, color: AppColors.fire),
-            label: 'Recovery',
           ),
           NavigationDestination(
             icon: Icon(Icons.history_outlined),

@@ -28,6 +28,7 @@ class BattleService {
     BattleOutcome outcome, {
     int difficulty = 0,
     String name = '',
+    BattleSource source = BattleSource.normal,
   }) async {
     try {
       final battle = Battle(
@@ -36,6 +37,7 @@ class BattleService {
         ts: DateTime.now(),
         difficulty: difficulty,
         name: name,
+        source: source,
       );
       await _battles(uid).add(battle.toMap());
       debugPrint('[BattleService] Recorded ${outcome.name} for $uid');

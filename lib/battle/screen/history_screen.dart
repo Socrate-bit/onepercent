@@ -119,14 +119,22 @@ class _BattleRow extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  isWin ? 'WIN' : 'LOSS',
-                  style: TextStyle(
-                    color: accent,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 1,
-                  ),
+                Row(
+                  children: [
+                    Text(
+                      isWin ? 'WIN' : 'LOSS',
+                      style: TextStyle(
+                        color: accent,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 1,
+                      ),
+                    ),
+                    if (battle.source != BattleSource.normal) ...[
+                      const SizedBox(width: 8),
+                      Flexible(child: _SourceChip(source: battle.source)),
+                    ],
+                  ],
                 ),
                 const SizedBox(height: 2),
                 Text(
@@ -178,6 +186,48 @@ class _DifficultyChip extends StatelessWidget {
               color: AppColors.textSecondary,
               fontSize: 10,
               letterSpacing: 1,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Human label + icon for a non-normal battle source.
+({String label, IconData icon}) sourceBadge(BattleSource source) =>
+    switch (source) {
+      BattleSource.validated => (label: 'Validated day', icon: Icons.verified_rounded),
+      BattleSource.recovery => (label: 'Recovery', icon: Icons.healing_rounded),
+      BattleSource.normal => (label: '', icon: Icons.circle),
+    };
+
+/// A small pill marking how a battle was logged (validated day / recovery).
+class _SourceChip extends StatelessWidget {
+  final BattleSource source;
+  const _SourceChip({required this.source});
+
+  @override
+  Widget build(BuildContext context) {
+    final badge = sourceBadge(source);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: AppColors.win.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: AppColors.win.withValues(alpha: 0.35)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(badge.icon, color: AppColors.win, size: 13),
+          const SizedBox(width: 5),
+          Text(
+            badge.label,
+            style: const TextStyle(
+              color: AppColors.win,
+              fontSize: 11,
+              fontWeight: FontWeight.w700,
             ),
           ),
         ],

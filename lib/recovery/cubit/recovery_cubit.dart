@@ -13,6 +13,7 @@ class RecoveryCubit extends Cubit<RecoveryState> {
   final RecoveryService _service;
   final String uid;
   StreamSubscription<List<RecoveryTask>>? _sub;
+  StreamSubscription<List<String>>? _presetSub;
 
   RecoveryCubit({required RecoveryService service, required this.uid})
       : _service = service,
@@ -29,6 +30,38 @@ class RecoveryCubit extends Cubit<RecoveryState> {
         emit(state.copyWith(loading: false, error: 'Could not load your tasks.'));
       },
     );
+    _presetSub = _service.watchPresets(uid).listen(
+      (presets) => emit(state.copyWith(customPresets: presets)),
+      onError: (e, st) {
+        debugPrint('[RecoveryCubit] preset stream error: $e\n$st');
+      },
+    );
+  }
+
+  /// Toggles [title] in the user's quick-add presets: removes it when already
+  /// bookmarked, otherwise adds it. Applies the change optimistically so the
+  /// UI updates instantly, reverting if the write fails.
+  Future<void> toggleBookmark(String title) async {
+    final trimmed = title.trim();
+    if (trimmed.isEmpty) return;
+    final previous = state.customPresets;
+    final isBookmarked = previous.contains(trimmed);
+    final optimistic = isBookmarked
+        ? previous.where((t) => t != trimmed).toList()
+        : [...previous, trimmed];
+    emit(state.copyWith(customPresets: optimistic));
+    try {
+      if (isBookmarked) {
+        await _service.removePreset(uid, trimmed);
+      } else {
+        await _service.addPreset(uid, trimmed);
+      }
+    } catch (e) {
+      emit(state.copyWith(
+        customPresets: previous,
+        error: 'Could not save preset. Check your connection.',
+      ));
+    }
   }
 
   /// Adds a new task. No-op for blank titles.
@@ -72,6 +105,7 @@ class RecoveryCubit extends Cubit<RecoveryState> {
   @override
   Future<void> close() {
     _sub?.cancel();
+    _presetSub?.cancel();
     return super.close();
   }
 }
