@@ -11,7 +11,7 @@ class CurrentBadgeCard extends StatelessWidget {
   /// Evaluated badges (see [evaluateStreakBadges]).
   final List<StreakBadge> badges;
 
-  /// The user's best-ever win streak, used to size the next-milestone progress.
+  /// The user's best-ever daily streak, used to size the next-milestone progress.
   final int bestStreak;
 
   final VoidCallback onTap;
@@ -34,7 +34,7 @@ class CurrentBadgeCard extends StatelessWidget {
     if (next != null) {
       final remaining = (next.requiredDays - bestStreak).clamp(0, next.requiredDays);
       subtitle = '$remaining more '
-          '${remaining == 1 ? 'win' : 'wins'} to ${next.name}';
+          '${remaining == 1 ? 'day' : 'days'} to ${next.name}';
       progress = (bestStreak / next.requiredDays).clamp(0.0, 1.0);
     } else {
       subtitle = 'All milestones unlocked';
