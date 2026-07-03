@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../battle/models/battle.dart';
 import '../../battle/util/streaks.dart';
@@ -30,37 +31,37 @@ class MilestonesScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
+              padding: EdgeInsets.fromLTRB(20.w, 12.h, 20.w, 0),
               child: _CloseButton(onTap: () => Navigator.pop(context)),
             ),
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
+                padding: EdgeInsets.fromLTRB(20.w, 12.h, 20.w, 32.h),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       'MILESTONES',
                       style: TextStyle(
                         color: AppColors.textPrimary,
-                        fontSize: 26,
+                        fontSize: 26.sp,
                         fontWeight: FontWeight.w800,
-                        letterSpacing: 1,
+                        letterSpacing: 1.sp,
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    SizedBox(height: 4.h),
                     Text(
                       'Best streak: $bestStreak ${bestStreak == 1 ? 'day' : 'days'}',
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: AppColors.textSecondary,
-                        fontSize: 14,
+                        fontSize: 14.sp,
                       ),
                     ),
-                    const SizedBox(height: 18),
+                    SizedBox(height: 18.h),
                     _ProgressCard(earned: earned, total: total),
-                    const SizedBox(height: 16),
+                    SizedBox(height: 16.h),
                     const _HowItWorks(),
-                    const SizedBox(height: 24),
+                    SizedBox(height: 24.h),
                     _BadgeGrid(badges: badges),
                   ],
                 ),
@@ -82,13 +83,13 @@ class _CloseButton extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 36,
-        height: 36,
+        width: 36.r,
+        height: 36.r,
         decoration: const BoxDecoration(
           color: AppColors.card,
           shape: BoxShape.circle,
         ),
-        child: const Icon(Icons.close, size: 18, color: AppColors.textPrimary),
+        child: Icon(Icons.close, size: 18.r, color: AppColors.textPrimary),
       ),
     );
   }
@@ -103,10 +104,10 @@ class _ProgressCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(16.r),
       decoration: BoxDecoration(
         color: AppColors.card,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(16.r),
         border: Border.all(color: AppColors.cardBorder),
       ),
       child: Column(
@@ -114,25 +115,25 @@ class _ProgressCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(Icons.workspace_premium_rounded,
-                  size: 20, color: AppColors.fire),
-              const SizedBox(width: 8),
+              Icon(Icons.workspace_premium_rounded,
+                  size: 20.r, color: AppColors.fire),
+              SizedBox(width: 8.w),
               Text(
                 '$earned of $total badges earned',
-                style: const TextStyle(
+                style: TextStyle(
                   color: AppColors.textPrimary,
-                  fontSize: 15,
+                  fontSize: 15.sp,
                   fontWeight: FontWeight.w700,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: 12.h),
           ClipRRect(
-            borderRadius: BorderRadius.circular(4),
+            borderRadius: BorderRadius.circular(4.r),
             child: LinearProgressIndicator(
               value: total > 0 ? earned / total : 0,
-              minHeight: 6,
+              minHeight: 6.h,
               backgroundColor: AppColors.cardBorder,
               valueColor: const AlwaysStoppedAnimation(AppColors.fire),
             ),
@@ -149,39 +150,39 @@ class _HowItWorks extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(16.r),
       decoration: BoxDecoration(
         color: AppColors.card,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(16.r),
         border: Border.all(color: AppColors.cardBorder),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            children: const [
+            children: [
               Icon(Icons.info_outline_rounded,
-                  size: 18, color: AppColors.textSecondary),
-              SizedBox(width: 8),
+                  size: 18.r, color: AppColors.textSecondary),
+              SizedBox(width: 8.w),
               Text(
                 'How streaks work',
                 style: TextStyle(
                   color: AppColors.textPrimary,
-                  fontSize: 15,
+                  fontSize: 15.sp,
                   fontWeight: FontWeight.w700,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 10),
-          const Text(
+          SizedBox(height: 10.h),
+          Text(
             'Your streak is the number of clean days in a row — days you win at '
             'least one battle and lose none. A day off keeps your streak frozen, '
             'and a loss resets it. Reaching a milestone unlocks its badge for '
             'good — the badges you’ve earned stay yours forever.',
             style: TextStyle(
               color: AppColors.textSecondary,
-              fontSize: 13,
+              fontSize: 13.sp,
               height: 1.5,
             ),
           ),
@@ -201,10 +202,10 @@ class _BadgeGrid extends StatelessWidget {
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 3,
-        mainAxisSpacing: 20,
-        crossAxisSpacing: 16,
+        mainAxisSpacing: 20.h,
+        crossAxisSpacing: 16.w,
         childAspectRatio: 0.72,
       ),
       itemCount: badges.length,
@@ -238,13 +239,13 @@ class _BadgeCell extends StatelessWidget {
           HexagonBadge(
             label: '${badge.requiredDays}',
             earned: badge.earned,
-            size: 72,
+            size: 72.r,
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: 8.h),
           Text(
             badge.name,
             style: TextStyle(
-              fontSize: 12,
+              fontSize: 12.sp,
               fontWeight: FontWeight.w700,
               color: badge.earned
                   ? AppColors.textPrimary
@@ -252,11 +253,11 @@ class _BadgeCell extends StatelessWidget {
             ),
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 2),
+          SizedBox(height: 2.h),
           Text(
             reqLabel,
-            style: const TextStyle(
-              fontSize: 10,
+            style: TextStyle(
+              fontSize: 10.sp,
               color: AppColors.textSecondary,
             ),
             textAlign: TextAlign.center,

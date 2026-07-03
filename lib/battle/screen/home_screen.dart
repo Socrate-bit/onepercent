@@ -5,6 +5,7 @@ import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../breathing/breathing_screen.dart';
 import '../../milestones/models/streak_badge.dart';
@@ -34,7 +35,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   /// Fixed height so BEST STREAK / WIN THIS WEEK cards stay the same size.
-  static const double _statCardHeight = 130;
+  static final double _statCardHeight = 130.h;
 
   late final ConfettiController _confetti =
       ConfettiController(duration: const Duration(milliseconds: 600));
@@ -171,14 +172,14 @@ class _HomeScreenState extends State<HomeScreen> {
           return Stack(
             children: [
               SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
+                padding: EdgeInsets.fromLTRB(20.w, 8.h, 20.w, 24.h),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     _header(state.totalWinsAllTime),
-                    const SizedBox(height: 24),
+                    SizedBox(height: 24.h),
                     Center(child: StreakRing(streak: state.currentStreak)),
-                    const SizedBox(height: 24),
+                    SizedBox(height: 24.h),
                     CurrentBadgeCard(
                       badges: evaluateStreakBadges(state.battles),
                       bestStreak: state.bestStreak,
@@ -189,7 +190,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 14),
+                    SizedBox(height: 14.h),
                     Row(
                       children: [
                         Expanded(
@@ -202,7 +203,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             caption: 'days',
                           ),
                         ),
-                        const SizedBox(width: 14),
+                        SizedBox(width: 14.w),
                         Expanded(
                           child: StatCard(
                             height: _statCardHeight,
@@ -218,18 +219,18 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 18),
+                    SizedBox(height: 18.h),
                     WinLossButtons(
                       onWin: () => _record(BattleOutcome.win),
                       onLoss: () => _record(BattleOutcome.loss),
                     ),
-                    const SizedBox(height: 14),
+                    SizedBox(height: 14.h),
                     _ValidateDayButton(
                       enabled: _canValidateDay(state),
                       lockedReason: _validateLockReason(state),
                       onTap: _validateDay,
                     ),
-                    const SizedBox(height: 24),
+                    SizedBox(height: 24.h),
                     const _Quote(
                         'I choose greatness over short-term comfort.'),
                   ],
@@ -266,22 +267,22 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _header(int totalWins) {
     return Row(
       children: [
-        const Expanded(
+        Expanded(
           child: Column(
             children: [
               Text(
                 'ONE PERCENT',
                 style: TextStyle(
                   color: AppColors.textPrimary,
-                  fontSize: 18,
+                  fontSize: 18.sp,
                   fontWeight: FontWeight.w800,
-                  letterSpacing: 2,
+                  letterSpacing: 2.sp,
                 ),
               ),
-              SizedBox(height: 2),
+              SizedBox(height: 2.h),
               Text(
                 'Master your mind, choose your future',
-                style: TextStyle(color: AppColors.textSecondary, fontSize: 13),
+                style: TextStyle(color: AppColors.textSecondary, fontSize: 13.sp),
               ),
             ],
           ),
@@ -311,7 +312,7 @@ class _ValidateDayButton extends StatelessWidget {
       color: enabled
           ? AppColors.win.withValues(alpha: 0.14)
           : AppColors.card,
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(16.r),
       child: InkWell(
         onTap: enabled
             ? () {
@@ -319,11 +320,11 @@ class _ValidateDayButton extends StatelessWidget {
                 onTap();
               }
             : null,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(16.r),
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+          padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 16.h),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(16.r),
             border: Border.all(
               color: enabled
                   ? AppColors.win.withValues(alpha: 0.5)
@@ -335,9 +336,9 @@ class _ValidateDayButton extends StatelessWidget {
               Icon(
                 enabled ? Icons.verified_rounded : Icons.lock_rounded,
                 color: accent,
-                size: 24,
+                size: 24.r,
               ),
-              const SizedBox(width: 14),
+              SizedBox(width: 14.w),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -346,16 +347,16 @@ class _ValidateDayButton extends StatelessWidget {
                       'VALIDATE DAY',
                       style: TextStyle(
                         color: accent,
-                        fontSize: 15,
+                        fontSize: 15.sp,
                         fontWeight: FontWeight.w800,
-                        letterSpacing: 1,
+                        letterSpacing: 1.sp,
                       ),
                     ),
-                    const SizedBox(height: 2),
+                    SizedBox(height: 2.h),
                     Text(
                       lockedReason ?? 'No loss today — log a win',
-                      style: const TextStyle(
-                          color: AppColors.textSecondary, fontSize: 12),
+                      style: TextStyle(
+                          color: AppColors.textSecondary, fontSize: 12.sp),
                     ),
                   ],
                 ),
@@ -379,9 +380,9 @@ class _Quote extends StatelessWidget {
     return Text(
       '“$text”',
       textAlign: TextAlign.center,
-      style: const TextStyle(
+      style: TextStyle(
         color: AppColors.textSecondary,
-        fontSize: 14,
+        fontSize: 14.sp,
         fontStyle: FontStyle.italic,
       ),
     );

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../theme/app_theme.dart';
 import '../models/battle.dart';
@@ -96,19 +97,19 @@ class _DifficultySheetState extends State<_DifficultySheet> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'TAG YOUR VALUES (optional)',
           style: TextStyle(
             color: AppColors.textSecondary,
-            fontSize: 11,
+            fontSize: 11.sp,
             fontWeight: FontWeight.w800,
-            letterSpacing: 1.5,
+            letterSpacing: 1.5.sp,
           ),
         ),
-        const SizedBox(height: 10),
+        SizedBox(height: 10.h),
         Wrap(
-          spacing: 8,
-          runSpacing: 8,
+          spacing: 8.w,
+          runSpacing: 8.h,
           children: [
             for (final value in _values)
               _ValueChip(
@@ -132,21 +133,21 @@ class _DifficultySheetState extends State<_DifficultySheet> {
   /// Loss-only support block: two reflective prompts and a breathe shortcut.
   Widget _reflection(Color accent) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(16.r),
       decoration: BoxDecoration(
         color: AppColors.background,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(16.r),
         border: Border.all(color: AppColors.cardBorder),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _question('Will you be happy to have done that tomorrow?'),
-          const SizedBox(height: 12),
+          SizedBox(height: 12.h),
           _question('What is the little step you feel to do?'),
-          const SizedBox(height: 16),
+          SizedBox(height: 16.h),
           _BreatheButton(onTap: () => _submit(breathe: true)),
-          const SizedBox(height: 10),
+          SizedBox(height: 10.h),
           _RecoveryButton(onTap: () => _submit(recover: true)),
         ],
       ),
@@ -157,15 +158,15 @@ class _DifficultySheetState extends State<_DifficultySheet> {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Icon(Icons.self_improvement_rounded,
-            color: AppColors.textSecondary, size: 18),
-        const SizedBox(width: 10),
+        Icon(Icons.self_improvement_rounded,
+            color: AppColors.textSecondary, size: 18.r),
+        SizedBox(width: 10.w),
         Expanded(
           child: Text(
             text,
-            style: const TextStyle(
+            style: TextStyle(
               color: AppColors.textPrimary,
-              fontSize: 14,
+              fontSize: 14.sp,
               height: 1.35,
               fontWeight: FontWeight.w600,
             ),
@@ -184,15 +185,15 @@ class _DifficultySheetState extends State<_DifficultySheet> {
       top: false,
       child: Container(
         padding: EdgeInsets.fromLTRB(
-          24,
-          12,
-          24,
-          24 + MediaQuery.of(context).viewInsets.bottom,
+          24.w,
+          12.h,
+          24.w,
+          24.h + MediaQuery.of(context).viewInsets.bottom,
         ),
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           color: AppColors.card,
-          border: Border(top: BorderSide(color: AppColors.cardBorder)),
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          border: const Border(top: BorderSide(color: AppColors.cardBorder)),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -201,12 +202,12 @@ class _DifficultySheetState extends State<_DifficultySheet> {
             // Grab handle.
             Center(
               child: Container(
-                width: 40,
-                height: 4,
-                margin: const EdgeInsets.only(bottom: 20),
+                width: 40.w,
+                height: 4.h,
+                margin: EdgeInsets.only(bottom: 20.h),
                 decoration: BoxDecoration(
                   color: AppColors.cardBorder,
-                  borderRadius: BorderRadius.circular(2),
+                  borderRadius: BorderRadius.circular(2.r),
                 ),
               ),
             ),
@@ -214,38 +215,38 @@ class _DifficultySheetState extends State<_DifficultySheet> {
               isWin ? 'LOGGING A WIN' : 'LOGGING A LOSS',
               style: TextStyle(
                 color: accent,
-                fontSize: 12,
+                fontSize: 12.sp,
                 fontWeight: FontWeight.w800,
-                letterSpacing: 1,
+                letterSpacing: 1.sp,
               ),
             ),
-            const SizedBox(height: 6),
-            const Text(
+            SizedBox(height: 6.h),
+            Text(
               'How hard is this one?',
               style: TextStyle(
                 color: AppColors.textPrimary,
-                fontSize: 22,
+                fontSize: 22.sp,
                 fontWeight: FontWeight.w800,
               ),
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: 20.h),
             Center(
               child: Text(
                 '${_value.round()}',
                 style: TextStyle(
                   color: accent,
-                  fontSize: 52,
+                  fontSize: 52.sp,
                   fontWeight: FontWeight.w800,
                 ),
               ),
             ),
-            const Center(
+            Center(
               child: Text(
                 'difficulty (0–10)',
-                style: TextStyle(color: AppColors.textSecondary, fontSize: 12),
+                style: TextStyle(color: AppColors.textSecondary, fontSize: 12.sp),
               ),
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: 8.h),
             SliderTheme(
               data: SliderThemeData(
                 activeTrackColor: accent,
@@ -263,7 +264,7 @@ class _DifficultySheetState extends State<_DifficultySheet> {
                 onChanged: (v) => setState(() => _value = v),
               ),
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16.h),
             TextField(
               controller: _nameController,
               textCapitalization: TextCapitalization.sentences,
@@ -277,47 +278,47 @@ class _DifficultySheetState extends State<_DifficultySheet> {
                 filled: true,
                 fillColor: AppColors.background,
                 contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                    EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
                 enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
+                  borderRadius: BorderRadius.circular(14.r),
                   borderSide: const BorderSide(color: AppColors.cardBorder),
                 ),
                 focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
+                  borderRadius: BorderRadius.circular(14.r),
                   borderSide: BorderSide(color: accent),
                 ),
               ),
             ),
             if (_values.isNotEmpty || widget.onAddValue != null) ...[
-              const SizedBox(height: 18),
+              SizedBox(height: 18.h),
               _valuePicker(accent),
             ],
             if (!isWin) ...[
-              const SizedBox(height: 20),
+              SizedBox(height: 20.h),
               _reflection(accent),
             ],
-            const SizedBox(height: 16),
+            SizedBox(height: 16.h),
             Row(
               children: [
                 Expanded(
                   child: TextButton(
                     onPressed: () => Navigator.of(context).pop(),
                     style: TextButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      padding: EdgeInsets.symmetric(vertical: 16.h),
                       foregroundColor: AppColors.textSecondary,
                     ),
                     child: const Text('CANCEL'),
                   ),
                 ),
-                const SizedBox(width: 12),
+                SizedBox(width: 12.w),
                 Expanded(
                   child: FilledButton(
                     onPressed: _submit,
                     style: FilledButton.styleFrom(
                       backgroundColor: accent,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      padding: EdgeInsets.symmetric(vertical: 16.h),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
+                        borderRadius: BorderRadius.circular(14.r),
                       ),
                     ),
                     child: const Text(
@@ -356,14 +357,14 @@ class _ValueChip extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       color: selected ? accent.withValues(alpha: 0.18) : AppColors.background,
-      borderRadius: BorderRadius.circular(20),
+      borderRadius: BorderRadius.circular(20.r),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(20.r),
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+          padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 9.h),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(20.r),
             border: Border.all(
               color: selected ? accent : AppColors.cardBorder,
             ),
@@ -375,15 +376,15 @@ class _ValueChip extends StatelessWidget {
                 selected
                     ? Icons.check_circle_rounded
                     : Icons.add_circle_outline_rounded,
-                size: 16,
+                size: 16.r,
                 color: selected ? accent : AppColors.textSecondary,
               ),
-              const SizedBox(width: 6),
+              SizedBox(width: 6.w),
               Text(
                 label,
                 style: TextStyle(
                   color: selected ? accent : AppColors.textPrimary,
-                  fontSize: 13,
+                  fontSize: 13.sp,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -406,26 +407,26 @@ class _AddValueChip extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       color: accent.withValues(alpha: 0.10),
-      borderRadius: BorderRadius.circular(20),
+      borderRadius: BorderRadius.circular(20.r),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(20.r),
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+          padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 9.h),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(20.r),
             border: Border.all(color: accent.withValues(alpha: 0.5)),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.add_rounded, size: 16, color: accent),
-              const SizedBox(width: 6),
+              Icon(Icons.add_rounded, size: 16.r, color: accent),
+              SizedBox(width: 6.w),
               Text(
                 'Add value',
                 style: TextStyle(
                   color: accent,
-                  fontSize: 13,
+                  fontSize: 13.sp,
                   fontWeight: FontWeight.w700,
                 ),
               ),
@@ -448,22 +449,22 @@ class _BreatheButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       color: _breathe.withValues(alpha: 0.14),
-      borderRadius: BorderRadius.circular(14),
+      borderRadius: BorderRadius.circular(14.r),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(14.r),
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
           child: Row(
             children: [
-              const Icon(Icons.air_rounded, color: _breathe, size: 22),
-              const SizedBox(width: 12),
-              const Expanded(
+              Icon(Icons.air_rounded, color: _breathe, size: 22.r),
+              SizedBox(width: 12.w),
+              Expanded(
                 child: Text(
                   'Take a breath first',
                   style: TextStyle(
                     color: _breathe,
-                    fontSize: 14,
+                    fontSize: 14.sp,
                     fontWeight: FontWeight.w800,
                   ),
                 ),
@@ -487,22 +488,22 @@ class _RecoveryButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       color: AppColors.win.withValues(alpha: 0.14),
-      borderRadius: BorderRadius.circular(14),
+      borderRadius: BorderRadius.circular(14.r),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(14.r),
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
           child: Row(
             children: [
-              const Icon(Icons.healing_rounded, color: AppColors.win, size: 22),
-              const SizedBox(width: 12),
-              const Expanded(
+              Icon(Icons.healing_rounded, color: AppColors.win, size: 22.r),
+              SizedBox(width: 12.w),
+              Expanded(
                 child: Text(
                   'Go to Recovery mode',
                   style: TextStyle(
                     color: AppColors.win,
-                    fontSize: 14,
+                    fontSize: 14.sp,
                     fontWeight: FontWeight.w800,
                   ),
                 ),

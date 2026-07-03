@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../theme/app_theme.dart';
 
@@ -26,8 +27,8 @@ Future<int?> showBreathingSetupDialog(BuildContext context) {
     context: context,
     backgroundColor: AppColors.card,
     isScrollControlled: true,
-    shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
     ),
     builder: (_) => const _BreathingSetupSheet(),
   );
@@ -55,41 +56,41 @@ class _BreathingSetupSheetState extends State<_BreathingSetupSheet> {
     return SafeArea(
       top: false,
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(24, 12, 24, 24),
+        padding: EdgeInsets.fromLTRB(24.w, 12.h, 24.w, 24.h),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Center(
               child: Container(
-                width: 40,
-                height: 4,
+                width: 40.w,
+                height: 4.h,
                 decoration: BoxDecoration(
                   color: AppColors.cardBorder,
-                  borderRadius: BorderRadius.circular(2),
+                  borderRadius: BorderRadius.circular(2.r),
                 ),
               ),
             ),
-            const SizedBox(height: 20),
-            const Text(
+            SizedBox(height: 20.h),
+            Text(
               'BREATHING',
               style: TextStyle(
                 color: _breathingAccent,
-                fontSize: 12,
+                fontSize: 12.sp,
                 fontWeight: FontWeight.w800,
-                letterSpacing: 1,
+                letterSpacing: 1.sp,
               ),
             ),
-            const SizedBox(height: 6),
-            const Text(
+            SizedBox(height: 6.h),
+            Text(
               'How many rounds?',
               style: TextStyle(
                 color: AppColors.textPrimary,
-                fontSize: 22,
+                fontSize: 22.sp,
                 fontWeight: FontWeight.w800,
               ),
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: 24.h),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -98,13 +99,13 @@ class _BreathingSetupSheetState extends State<_BreathingSetupSheet> {
                   onTap: _rounds > _minRounds ? () => _step(-1) : null,
                 ),
                 SizedBox(
-                  width: 96,
+                  width: 96.w,
                   child: Text(
                     '$_rounds',
                     textAlign: TextAlign.center,
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: AppColors.textPrimary,
-                      fontSize: 48,
+                      fontSize: 48.sp,
                       fontWeight: FontWeight.w800,
                     ),
                   ),
@@ -115,29 +116,29 @@ class _BreathingSetupSheetState extends State<_BreathingSetupSheet> {
                 ),
               ],
             ),
-            const SizedBox(height: 8),
-            const Text(
+            SizedBox(height: 8.h),
+            Text(
               'rounds',
               textAlign: TextAlign.center,
-              style: TextStyle(color: AppColors.textSecondary, fontSize: 13),
+              style: TextStyle(color: AppColors.textSecondary, fontSize: 13.sp),
             ),
-            const SizedBox(height: 28),
+            SizedBox(height: 28.h),
             FilledButton(
               onPressed: () => Navigator.of(context).pop(_rounds),
               style: FilledButton.styleFrom(
                 backgroundColor: _breathingAccent,
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 16),
+                padding: EdgeInsets.symmetric(vertical: 16.h),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(16.r),
                 ),
               ),
-              child: const Text(
+              child: Text(
                 'START',
                 style: TextStyle(
-                  fontSize: 15,
+                  fontSize: 15.sp,
                   fontWeight: FontWeight.w800,
-                  letterSpacing: 1,
+                  letterSpacing: 1.sp,
                 ),
               ),
             ),
@@ -164,8 +165,8 @@ class _StepButton extends StatelessWidget {
         onTap: onTap,
         customBorder: const CircleBorder(),
         child: Container(
-          width: 56,
-          height: 56,
+          width: 56.r,
+          height: 56.r,
           alignment: Alignment.center,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
@@ -173,7 +174,7 @@ class _StepButton extends StatelessWidget {
           ),
           child: Icon(
             icon,
-            size: 28,
+            size: 28.r,
             color: enabled ? _breathingAccent : AppColors.textSecondary,
           ),
         ),
@@ -345,16 +346,16 @@ class _BreathingScreenState extends State<BreathingScreen>
                 children: [
                   Text(
                     _phaseLabel,
-                    style: const TextStyle(
-                      fontSize: 30,
+                    style: TextStyle(
+                      fontSize: 30.sp,
                       fontWeight: FontWeight.w600,
                       color: AppColors.textPrimary,
                     ),
                   ),
-                  const SizedBox(height: 32),
+                  SizedBox(height: 32.h),
                   SizedBox(
-                    width: 260,
-                    height: 260,
+                    width: 260.r,
+                    height: 260.r,
                     child: AnimatedBuilder(
                       animation: _controller,
                       builder: (_, _) => CustomPaint(
@@ -362,11 +363,11 @@ class _BreathingScreenState extends State<BreathingScreen>
                       ),
                     ),
                   ),
-                  const SizedBox(height: 32),
+                  SizedBox(height: 32.h),
                   Text(
                     'Round ${_round + 1} of ${widget.rounds}',
-                    style: const TextStyle(
-                      fontSize: 16,
+                    style: TextStyle(
+                      fontSize: 16.sp,
                       color: AppColors.textSecondary,
                     ),
                   ),
@@ -374,16 +375,16 @@ class _BreathingScreenState extends State<BreathingScreen>
               ),
             ),
             Positioned(
-              top: 8,
-              right: 8,
+              top: 8.h,
+              right: 8.w,
               child: IconButton(
                 icon: const Icon(Icons.close, color: AppColors.textSecondary),
                 onPressed: () => Navigator.of(context).pop(),
               ),
             ),
             Positioned(
-              top: 8,
-              left: 8,
+              top: 8.h,
+              left: 8.w,
               child: IconButton(
                 icon: Icon(
                   _muted ? Icons.volume_off : Icons.volume_up,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../theme/app_theme.dart';
 import '../models/battle.dart';
@@ -23,17 +24,17 @@ class HistoryDetailScreen extends StatelessWidget {
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
+          padding: EdgeInsets.fromLTRB(20.w, 8.h, 20.w, 24.h),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               // Outcome header.
               Container(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 20, vertical: 24),
+                padding: EdgeInsets.symmetric(
+                    horizontal: 20.w, vertical: 24.h),
                 decoration: BoxDecoration(
                   color: accent.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(20.r),
                   border: Border.all(color: accent.withValues(alpha: 0.4)),
                 ),
                 child: Row(
@@ -43,22 +44,22 @@ class HistoryDetailScreen extends StatelessWidget {
                           ? Icons.check_circle_rounded
                           : Icons.cancel_rounded,
                       color: accent,
-                      size: 40,
+                      size: 40.r,
                     ),
-                    const SizedBox(width: 16),
+                    SizedBox(width: 16.w),
                     Text(
                       isWin ? 'WIN' : 'LOSS',
                       style: TextStyle(
                         color: accent,
-                        fontSize: 28,
+                        fontSize: 28.sp,
                         fontWeight: FontWeight.w900,
-                        letterSpacing: 1.5,
+                        letterSpacing: 1.5.sp,
                       ),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: 16.h),
               if (battle.source != BattleSource.normal) ...[
                 Builder(builder: (context) {
                   final badge = sourceBadge(battle.source);
@@ -67,29 +68,29 @@ class HistoryDetailScreen extends StatelessWidget {
                     label: 'TYPE',
                     child: Text(
                       badge.label,
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: AppColors.win,
-                        fontSize: 16,
+                        fontSize: 16.sp,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
                   );
                 }),
-                const SizedBox(height: 12),
+                SizedBox(height: 12.h),
               ],
               _InfoTile(
                 icon: Icons.event_rounded,
                 label: 'WHEN',
                 child: Text(
                   formatBattleDate(battle.ts),
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: AppColors.textPrimary,
-                    fontSize: 16,
+                    fontSize: 16.sp,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: 12.h),
               _InfoTile(
                 icon: Icons.whatshot_rounded,
                 label: 'DIFFICULTY',
@@ -101,16 +102,16 @@ class HistoryDetailScreen extends StatelessWidget {
                       '${battle.difficulty}',
                       style: TextStyle(
                         color: diffColor,
-                        fontSize: 22,
+                        fontSize: 22.sp,
                         fontWeight: FontWeight.w900,
                       ),
                     ),
-                    const SizedBox(width: 4),
-                    const Text(
+                    SizedBox(width: 4.w),
+                    Text(
                       '/ 10',
                       style: TextStyle(
                         color: AppColors.textSecondary,
-                        fontSize: 14,
+                        fontSize: 14.sp,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -118,15 +119,15 @@ class HistoryDetailScreen extends StatelessWidget {
                 ),
               ),
               if (battle.values.isNotEmpty) ...[
-                const SizedBox(height: 12),
+                SizedBox(height: 12.h),
                 _InfoTile(
                   icon: Icons.favorite_rounded,
                   label: 'VALUES',
                   child: Padding(
-                    padding: const EdgeInsets.only(top: 2),
+                    padding: EdgeInsets.only(top: 2.h),
                     child: Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
+                      spacing: 8.w,
+                      runSpacing: 8.h,
                       children: [
                         for (final v in battle.values) _ValueChip(label: v),
                       ],
@@ -134,7 +135,7 @@ class HistoryDetailScreen extends StatelessWidget {
                   ),
                 ),
               ],
-              const SizedBox(height: 12),
+              SizedBox(height: 12.h),
               _InfoTile(
                 icon: Icons.notes_rounded,
                 label: 'NOTE',
@@ -144,7 +145,7 @@ class HistoryDetailScreen extends StatelessWidget {
                     color: battle.name.isEmpty
                         ? AppColors.textSecondary
                         : AppColors.textPrimary,
-                    fontSize: 16,
+                    fontSize: 16.sp,
                     fontStyle: battle.name.isEmpty
                         ? FontStyle.italic
                         : FontStyle.normal,
@@ -168,17 +169,17 @@ class _ValueChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
       decoration: BoxDecoration(
         color: AppColors.fire.withValues(alpha: 0.14),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(20.r),
         border: Border.all(color: AppColors.fire.withValues(alpha: 0.4)),
       ),
       child: Text(
         label,
-        style: const TextStyle(
+        style: TextStyle(
           color: AppColors.fire,
-          fontSize: 13,
+          fontSize: 13.sp,
           fontWeight: FontWeight.w700,
         ),
       ),
@@ -200,31 +201,31 @@ class _InfoTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(16.r),
       decoration: BoxDecoration(
         color: AppColors.card,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(16.r),
         border: Border.all(color: AppColors.cardBorder),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, color: AppColors.textSecondary, size: 20),
-          const SizedBox(width: 14),
+          Icon(icon, color: AppColors.textSecondary, size: 20.r),
+          SizedBox(width: 14.w),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   label,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: AppColors.textSecondary,
-                    fontSize: 11,
+                    fontSize: 11.sp,
                     fontWeight: FontWeight.w700,
-                    letterSpacing: 1.5,
+                    letterSpacing: 1.5.sp,
                   ),
                 ),
-                const SizedBox(height: 6),
+                SizedBox(height: 6.h),
                 child,
               ],
             ),
