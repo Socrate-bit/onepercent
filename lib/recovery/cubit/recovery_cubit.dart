@@ -60,6 +60,15 @@ class RecoveryCubit extends Cubit<RecoveryState> {
     }
   }
 
+  /// Wipes the whole checklist (used after a recovery win is logged).
+  Future<void> clearTasks() async {
+    try {
+      await _service.clearTasks(uid);
+    } catch (e) {
+      emit(state.copyWith(error: 'Could not clear tasks. Check your connection.'));
+    }
+  }
+
   @override
   Future<void> close() {
     _sub?.cancel();

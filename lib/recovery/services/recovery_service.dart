@@ -57,4 +57,19 @@ class RecoveryService {
       rethrow;
     }
   }
+
+  /// Removes every recovery task for [uid] in a single batch.
+  Future<void> clearTasks(String uid) async {
+    try {
+      final snap = await _tasks(uid).get();
+      final batch = _db.batch();
+      for (final doc in snap.docs) {
+        batch.delete(doc.reference);
+      }
+      await batch.commit();
+    } catch (e, st) {
+      debugPrint('[RecoveryService] clearTasks failed: $e\n$st');
+      rethrow;
+    }
+  }
 }
