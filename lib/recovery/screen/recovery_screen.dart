@@ -1,6 +1,12 @@
+import 'dart:math' as math;
+
+import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../battle/cubit/battle_cubit.dart';
+import '../../battle/models/battle.dart';
+import '../../battle/widget/difficulty_dialog.dart';
 import '../../theme/app_theme.dart';
 import '../cubit/recovery_cubit.dart';
 import '../cubit/recovery_state.dart';
@@ -9,15 +15,44 @@ import '../widget/add_task_dialog.dart';
 
 /// The "Recovery mode" tab: a small checklist to lean on when getting back on
 /// track. Add tasks from a modal, check them off, delete when done. A header
-/// counter shows how many are done out of the total (e.g. "2 / 3").
-class RecoveryScreen extends StatelessWidget {
+/// counter shows how many are done out of the total (e.g. "2 / 3"). Once every
+/// task is checked, the Recover button unlocks: it logs a win, then clears the
+/// checklist so the next slump starts clean.
+class RecoveryScreen extends StatefulWidget {
   const RecoveryScreen({super.key});
+
+  @override
+  State<RecoveryScreen> createState() => _RecoveryScreenState();
+}
+
+class _RecoveryScreenState extends State<RecoveryScreen> {
+  late final ConfettiController _confetti =
+      ConfettiController(duration: const Duration(seconds: 1));
+
+  @override
+  void dispose() {
+    _confetti.dispose();
+    super.dispose();
+  }
 
   Future<void> _add(BuildContext context) async {
     final cubit = context.read<RecoveryCubit>();
     final title = await showAddTaskDialog(context);
     if (title == null) return;
     cubit.addTask(title);
+  }
+
+  /// Recovery payoff: open the win pop-up, record the win, celebrate, then wipe
+  /// the finished checklist. Cancelling the dialog records nothing and keeps the
+  /// tasks intact.
+  Future<void> _recover(BuildContext context) async {
+    final recovery = context.read<RecoveryCubit>();
+    final battle = context.read<BattleCubit>();
+    final entry = await showDifficultyDialog(context, BattleOutcome.win);
+    if (entry == null) return;
+    await battle.recordWin(difficulty: entry.difficulty, name: entry.name);
+    _confetti.play();
+    await recovery.clearTasks();
   }
 
   @override
@@ -32,53 +67,83 @@ class RecoveryScreen extends StatelessWidget {
       ),
       body: SafeArea(
         bottom: false,
-        child: BlocConsumer<RecoveryCubit, RecoveryState>(
-          listenWhen: (prev, curr) =>
-              prev.error != curr.error && curr.error != null,
-          listener: (context, state) {
-            ScaffoldMessenger.of(context)
-              ..hideCurrentSnackBar()
-              ..showSnackBar(SnackBar(content: Text(state.error!)));
-          },
-          builder: (context, state) {
-            return CustomScrollView(
-              slivers: [
-                SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
-                  sliver: SliverToBoxAdapter(child: _Header(state: state)),
-                ),
-                if (state.loading && state.tasks.isEmpty)
-                  const SliverFillRemaining(
-                    hasScrollBody: false,
-                    child: Center(child: CircularProgressIndicator()),
-                  )
-                else if (state.tasks.isEmpty)
-                  const SliverFillRemaining(
-                    hasScrollBody: false,
-                    child: _EmptyState(),
-                  )
-                else
-                  SliverPadding(
-                    padding: const EdgeInsets.fromLTRB(20, 0, 20, 96),
-                    sliver: SliverList.separated(
-                      itemCount: state.tasks.length,
-                      separatorBuilder: (_, _) => const SizedBox(height: 10),
-                      itemBuilder: (_, i) => _TaskRow(task: state.tasks[i]),
+        child: Stack(
+          children: [
+            BlocConsumer<RecoveryCubit, RecoveryState>(
+              listenWhen: (prev, curr) =>
+                  prev.error != curr.error && curr.error != null,
+              listener: (context, state) {
+                ScaffoldMessenger.of(context)
+                  ..hideCurrentSnackBar()
+                  ..showSnackBar(SnackBar(content: Text(state.error!)));
+              },
+              builder: (context, state) {
+                return CustomScrollView(
+                  slivers: [
+                    SliverPadding(
+                      padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
+                      sliver: SliverToBoxAdapter(
+                        child: _Header(
+                          state: state,
+                          onRecover: () => _recover(context),
+                        ),
+                      ),
                     ),
-                  ),
-              ],
-            );
-          },
+                    if (state.loading && state.tasks.isEmpty)
+                      const SliverFillRemaining(
+                        hasScrollBody: false,
+                        child: Center(child: CircularProgressIndicator()),
+                      )
+                    else if (state.tasks.isEmpty)
+                      const SliverFillRemaining(
+                        hasScrollBody: false,
+                        child: _EmptyState(),
+                      )
+                    else
+                      SliverPadding(
+                        padding: const EdgeInsets.fromLTRB(20, 0, 20, 96),
+                        sliver: SliverList.separated(
+                          itemCount: state.tasks.length,
+                          separatorBuilder: (_, _) => const SizedBox(height: 10),
+                          itemBuilder: (_, i) => _TaskRow(task: state.tasks[i]),
+                        ),
+                      ),
+                  ],
+                );
+              },
+            ),
+            Align(
+              alignment: Alignment.topCenter,
+              child: ConfettiWidget(
+                confettiController: _confetti,
+                blastDirection: math.pi / 2, // straight down
+                emissionFrequency: 0.05,
+                numberOfParticles: 24,
+                maxBlastForce: 22,
+                minBlastForce: 8,
+                gravity: 0.25,
+                shouldLoop: false,
+                colors: const [
+                  AppColors.win,
+                  AppColors.fire,
+                  Color(0xFF5AA9FF),
+                  Colors.white,
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 }
 
-/// Title plus the "done / total" progress counter.
+/// Title, the "done / total" progress counter, and the Recover button that sits
+/// to its right (unlocked once every task is done).
 class _Header extends StatelessWidget {
   final RecoveryState state;
-  const _Header({required this.state});
+  final VoidCallback onRecover;
+  const _Header({required this.state, required this.onRecover});
 
   @override
   Widget build(BuildContext context) {
@@ -100,8 +165,50 @@ class _Header extends StatelessWidget {
           style: TextStyle(color: AppColors.textSecondary, fontSize: 13),
         ),
         const SizedBox(height: 16),
-        _Counter(done: state.doneCount, total: state.total),
+        Row(
+          children: [
+            Expanded(child: _Counter(done: state.doneCount, total: state.total)),
+            const SizedBox(width: 12),
+            _RecoverButton(enabled: state.allDone, onTap: onRecover),
+          ],
+        ),
       ],
+    );
+  }
+}
+
+/// The "Recover" call-to-action beside the progress bar. Disabled (greyed out)
+/// until all tasks are checked, then lights up green.
+class _RecoverButton extends StatelessWidget {
+  final bool enabled;
+  final VoidCallback onTap;
+  const _RecoverButton({required this.enabled, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return FilledButton.icon(
+      onPressed: enabled ? onTap : null,
+      icon: Icon(enabled ? Icons.emoji_events_rounded : Icons.lock_rounded,
+          size: 18),
+      label: const Text('RECOVER'),
+      style: FilledButton.styleFrom(
+        backgroundColor: AppColors.win,
+        foregroundColor: Colors.white,
+        disabledBackgroundColor: AppColors.card,
+        disabledForegroundColor: AppColors.textSecondary,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        textStyle: const TextStyle(
+          fontSize: 13,
+          fontWeight: FontWeight.w800,
+          letterSpacing: 0.5,
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(14),
+          side: enabled
+              ? BorderSide.none
+              : const BorderSide(color: AppColors.cardBorder),
+        ),
+      ),
     );
   }
 }
