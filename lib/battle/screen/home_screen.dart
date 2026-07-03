@@ -13,6 +13,7 @@ import '../../milestones/widget/current_badge_card.dart';
 import '../../recovery/cubit/recovery_cubit.dart';
 import '../../recovery/screen/recovery_screen.dart';
 import '../../theme/app_theme.dart';
+import '../../value/cubit/value_cubit.dart';
 import '../cubit/battle_cubit.dart';
 import '../cubit/battle_state.dart';
 import '../models/battle.dart';
@@ -63,14 +64,18 @@ class _HomeScreenState extends State<HomeScreen> {
   /// the confetti burst. Bailing out of the dialog records nothing.
   Future<void> _record(BattleOutcome outcome) async {
     final cubit = context.read<BattleCubit>();
-    final entry = await showDifficultyDialog(context, outcome);
+    final values =
+        context.read<ValueCubit>().state.values.map((v) => v.title).toList();
+    final entry = await showDifficultyDialog(context, outcome, values: values);
     if (entry == null) return;
 
     if (outcome == BattleOutcome.win) {
-      cubit.recordWin(difficulty: entry.difficulty, name: entry.name);
+      cubit.recordWin(
+          difficulty: entry.difficulty, name: entry.name, values: entry.values);
       _confetti.play();
     } else {
-      cubit.recordLoss(difficulty: entry.difficulty, name: entry.name);
+      cubit.recordLoss(
+          difficulty: entry.difficulty, name: entry.name, values: entry.values);
       if (entry.breathe && mounted) {
         await _startBreathing(context);
       } else if (entry.recover && mounted) {
@@ -85,12 +90,14 @@ class _HomeScreenState extends State<HomeScreen> {
   void _openRecovery(BuildContext context, {bool openAddOnStart = false}) {
     final battleCubit = context.read<BattleCubit>();
     final recoveryCubit = context.read<RecoveryCubit>();
+    final valueCubit = context.read<ValueCubit>();
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => MultiBlocProvider(
           providers: [
             BlocProvider.value(value: battleCubit),
             BlocProvider.value(value: recoveryCubit),
+            BlocProvider.value(value: valueCubit),
           ],
           child: Scaffold(
             appBar: AppBar(
@@ -208,22 +215,6 @@ class _HomeScreenState extends State<HomeScreen> {
                       lockedReason: _validateLockReason(state),
                       onTap: _validateDay,
                     ),
-                    const SizedBox(height: 16),
-                    _ActionButton(
-                      icon: Icons.air_rounded,
-                      iconColor: const Color(0xFF5AA9FF),
-                      title: 'BREATHE',
-                      subtitle: 'Pause. Reset. Refocus.',
-                      onTap: () => _startBreathing(context),
-                    ),
-                    const SizedBox(height: 12),
-                    _ActionButton(
-                      icon: Icons.healing_rounded,
-                      iconColor: AppColors.win,
-                      title: 'RECOVERY',
-                      subtitle: 'Small steps to take back momentum.',
-                      onTap: () => _openRecovery(context, openAddOnStart: true),
-                    ),
                     const SizedBox(height: 24),
                     const _Quote(
                         'I choose greatness over short-term comfort.'),
@@ -282,73 +273,6 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ],
-    );
-  }
-}
-
-/// A tappable card row with a leading icon, title, subtitle, and chevron —
-/// used for the Breathe and Recovery shortcuts under the Win/Loss buttons.
-class _ActionButton extends StatelessWidget {
-  final IconData icon;
-  final Color iconColor;
-  final String title;
-  final String subtitle;
-  final VoidCallback onTap;
-
-  const _ActionButton({
-    required this.icon,
-    required this.iconColor,
-    required this.title,
-    required this.subtitle,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: AppColors.card,
-      borderRadius: BorderRadius.circular(16),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: AppColors.cardBorder),
-          ),
-          child: Row(
-            children: [
-              Icon(icon, color: iconColor, size: 24),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: const TextStyle(
-                        color: AppColors.textPrimary,
-                        fontSize: 15,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: 1,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      subtitle,
-                      style: const TextStyle(
-                          color: AppColors.textSecondary, fontSize: 12),
-                    ),
-                  ],
-                ),
-              ),
-              const Icon(Icons.chevron_right_rounded,
-                  color: AppColors.textSecondary),
-            ],
-          ),
-        ),
-      ),
     );
   }
 }

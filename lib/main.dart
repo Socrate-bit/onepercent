@@ -14,6 +14,9 @@ import 'firebase_options.dart';
 import 'recovery/cubit/recovery_cubit.dart';
 import 'recovery/services/recovery_service.dart';
 import 'theme/app_theme.dart';
+import 'tools/screen/tools_screen.dart';
+import 'value/cubit/value_cubit.dart';
+import 'value/services/value_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -75,6 +78,9 @@ class _BootstrapState extends State<_Bootstrap> {
               create: (_) =>
                   RecoveryCubit(service: RecoveryService(), uid: uid),
             ),
+            BlocProvider(
+              create: (_) => ValueCubit(service: ValueService(), uid: uid),
+            ),
           ],
           child: const HomeShell(),
         );
@@ -92,7 +98,7 @@ class _Centered extends StatelessWidget {
       Scaffold(body: Center(child: child));
 }
 
-/// Bottom-nav shell hosting the tabs: Today, History, and Stats.
+/// Bottom-nav shell hosting the tabs: Today, Tools, History, and Stats.
 class HomeShell extends StatefulWidget {
   const HomeShell({super.key});
 
@@ -105,6 +111,7 @@ class _HomeShellState extends State<HomeShell> {
 
   static const _tabs = [
     HomeScreen(),
+    ToolsScreen(),
     HistoryScreen(),
     StatsScreen(),
   ];
@@ -123,6 +130,11 @@ class _HomeShellState extends State<HomeShell> {
             icon: Icon(Icons.today_outlined),
             selectedIcon: Icon(Icons.today, color: AppColors.fire),
             label: 'Today',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.handyman_outlined),
+            selectedIcon: Icon(Icons.handyman, color: AppColors.fire),
+            label: 'Tools',
           ),
           NavigationDestination(
             icon: Icon(Icons.history_outlined),

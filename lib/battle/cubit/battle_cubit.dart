@@ -36,19 +36,23 @@ class BattleCubit extends Cubit<BattleState> {
     int difficulty = 0,
     String name = '',
     BattleSource source = BattleSource.normal,
+    List<String> values = const [],
   }) =>
-      _record(BattleOutcome.win, difficulty, name, source);
+      _record(BattleOutcome.win, difficulty, name, source, values);
 
   /// Records a loss (breaks the current day's streak on the next emission).
-  Future<void> recordLoss({int difficulty = 0, String name = ''}) =>
-      _record(BattleOutcome.loss, difficulty, name, BattleSource.normal);
+  Future<void> recordLoss({
+    int difficulty = 0,
+    String name = '',
+    List<String> values = const [],
+  }) =>
+      _record(BattleOutcome.loss, difficulty, name, BattleSource.normal, values);
 
-  Future<void> _record(
-      BattleOutcome outcome, int difficulty, String name,
-      BattleSource source) async {
+  Future<void> _record(BattleOutcome outcome, int difficulty, String name,
+      BattleSource source, List<String> values) async {
     try {
       await _service.addBattle(uid, outcome,
-          difficulty: difficulty, name: name, source: source);
+          difficulty: difficulty, name: name, source: source, values: values);
     } catch (e) {
       emit(state.copyWith(error: 'Could not save. Check your connection.'));
     }

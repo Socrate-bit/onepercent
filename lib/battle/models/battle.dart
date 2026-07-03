@@ -40,6 +40,9 @@ class Battle extends Equatable {
   /// How this battle was logged (normal, day validation, or recovery).
   final BattleSource source;
 
+  /// The user's personal values tagged onto this decision (empty if none).
+  final List<String> values;
+
   const Battle({
     required this.id,
     required this.outcome,
@@ -47,6 +50,7 @@ class Battle extends Equatable {
     this.difficulty = 0,
     this.name = '',
     this.source = BattleSource.normal,
+    this.values = const [],
   });
 
   bool get isWin => outcome == BattleOutcome.win;
@@ -64,6 +68,7 @@ class Battle extends Equatable {
       difficulty: (data['difficulty'] as num?)?.toInt() ?? 0,
       name: data['name'] as String? ?? '',
       source: BattleSource.fromName(data['source'] as String?),
+      values: (data['values'] as List?)?.cast<String>() ?? const [],
     );
   }
 
@@ -74,8 +79,10 @@ class Battle extends Equatable {
         'difficulty': difficulty,
         'name': name,
         'source': source.name,
+        'values': values,
       };
 
   @override
-  List<Object?> get props => [id, outcome, ts, difficulty, name, source];
+  List<Object?> get props =>
+      [id, outcome, ts, difficulty, name, source, values];
 }

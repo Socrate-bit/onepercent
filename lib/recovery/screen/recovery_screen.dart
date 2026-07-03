@@ -8,6 +8,7 @@ import '../../battle/cubit/battle_cubit.dart';
 import '../../battle/models/battle.dart';
 import '../../battle/widget/difficulty_dialog.dart';
 import '../../theme/app_theme.dart';
+import '../../value/cubit/value_cubit.dart';
 import '../cubit/recovery_cubit.dart';
 import '../cubit/recovery_state.dart';
 import '../models/recovery_task.dart';
@@ -68,12 +69,16 @@ class _RecoveryScreenState extends State<RecoveryScreen> {
   Future<void> _recover(BuildContext context) async {
     final recovery = context.read<RecoveryCubit>();
     final battle = context.read<BattleCubit>();
-    final entry = await showDifficultyDialog(context, BattleOutcome.win);
+    final values =
+        context.read<ValueCubit>().state.values.map((v) => v.title).toList();
+    final entry =
+        await showDifficultyDialog(context, BattleOutcome.win, values: values);
     if (entry == null) return;
     await battle.recordWin(
       difficulty: entry.difficulty,
       name: entry.name,
       source: BattleSource.recovery,
+      values: entry.values,
     );
     _confetti.play();
     await recovery.clearTasks();
