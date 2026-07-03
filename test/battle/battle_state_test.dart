@@ -18,12 +18,12 @@ const win = BattleOutcome.win;
 const loss = BattleOutcome.loss;
 
 void main() {
-  group('currentStreak', () {
+  group('currentStreak (clean days)', () {
     test('is 0 when there are no battles', () {
       expect(const BattleState().currentStreak, 0);
     });
 
-    test('counts consecutive wins from the most recent battle', () {
+    test('counts consecutive clean days up to the latest active day', () {
       // oldest -> newest
       final s = BattleState(battles: [
         _b(loss, days: 5),
@@ -34,16 +34,44 @@ void main() {
       expect(s.currentStreak, 3);
     });
 
-    test('is 0 when the most recent battle is a loss', () {
+    test('multiple wins on the same day count as one day', () {
+      final s = BattleState(battles: [
+        _b(win, days: 1, minute: 1),
+        _b(win, days: 1, minute: 2),
+        _b(win, days: 0, minute: 1),
+        _b(win, days: 0, minute: 2),
+      ]);
+      expect(s.currentStreak, 2);
+    });
+
+    test('a frozen (empty) day between clean days does not break it', () {
+      // wins 5 and 2 days ago; days 4 and 3 have no battles at all.
+      final s = BattleState(battles: [
+        _b(win, days: 5),
+        _b(win, days: 2),
+      ]);
+      expect(s.currentStreak, 2);
+    });
+
+    test('is 0 when the latest active day had a loss', () {
       final s = BattleState(battles: [
         _b(win, days: 3),
         _b(win, days: 2),
-        _b(loss, days: 1),
+        _b(loss, days: 0),
       ]);
       expect(s.currentStreak, 0);
     });
 
-    test('resets after a loss even with earlier wins', () {
+    test('a loss breaks a day even if that day also had a win', () {
+      final s = BattleState(battles: [
+        _b(win, days: 1),
+        _b(win, days: 0, minute: 1),
+        _b(loss, days: 0, minute: 2),
+      ]);
+      expect(s.currentStreak, 0);
+    });
+
+    test('resets after a loss day even with earlier clean days', () {
       final s = BattleState(battles: [
         _b(win, days: 6),
         _b(win, days: 5),
@@ -54,12 +82,12 @@ void main() {
     });
   });
 
-  group('bestStreak', () {
+  group('bestStreak (clean days)', () {
     test('is 0 with no battles', () {
       expect(const BattleState().bestStreak, 0);
     });
 
-    test('finds the longest run of wins across history', () {
+    test('finds the longest run of clean days across history', () {
       final s = BattleState(battles: [
         _b(win, days: 10),
         _b(win, days: 9),
@@ -72,6 +100,15 @@ void main() {
         _b(win, days: 2),
       ]);
       expect(s.bestStreak, 4);
+    });
+
+    test('counts a clean day once regardless of how many wins it holds', () {
+      final s = BattleState(battles: [
+        _b(win, days: 2, minute: 1),
+        _b(win, days: 2, minute: 2),
+        _b(win, days: 1),
+      ]);
+      expect(s.bestStreak, 2);
     });
 
     test('best streak can be the current (ongoing) streak', () {

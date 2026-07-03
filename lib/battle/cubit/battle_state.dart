@@ -2,6 +2,7 @@ import 'package:equatable/equatable.dart';
 
 import '../models/battle.dart';
 import '../util/discipline_percentile.dart';
+import '../util/streaks.dart';
 
 /// Time window applied to the aggregate Stats metrics.
 enum StatsRange {
@@ -83,33 +84,12 @@ class BattleState extends Equatable {
 
   // --- All-time streaks (window does not apply) ---------------------------
 
-  /// Consecutive wins since the last loss (0 if the most recent battle lost).
-  int get currentStreak {
-    var streak = 0;
-    for (var i = battles.length - 1; i >= 0; i--) {
-      if (battles[i].isWin) {
-        streak++;
-      } else {
-        break;
-      }
-    }
-    return streak;
-  }
+  /// Consecutive clean days (a win, no loss) up to the most recent active day;
+  /// 0 if that day had a loss. Empty days in between are frozen, not breaks.
+  int get currentStreak => dailyCurrentStreak(battles);
 
-  /// Longest run of consecutive wins ever recorded.
-  int get bestStreak {
-    var best = 0;
-    var run = 0;
-    for (final b in battles) {
-      if (b.isWin) {
-        run++;
-        if (run > best) best = run;
-      } else {
-        run = 0;
-      }
-    }
-    return best;
-  }
+  /// Longest run of consecutive clean days ever recorded.
+  int get bestStreak => dailyBestStreak(battles);
 
   /// Lifetime total wins (not windowed) — shown on Home.
   int get totalWinsAllTime => battles.where((b) => b.isWin).length;

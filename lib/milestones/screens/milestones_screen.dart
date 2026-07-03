@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 
 import '../../battle/models/battle.dart';
+import '../../battle/util/streaks.dart';
 import '../../theme/app_theme.dart';
 import '../models/streak_badge.dart';
 import '../widget/hexagon_badge.dart';
 import 'badge_unlock_screen.dart';
 
 /// The full milestones screen: every streak badge in a grid, with a summary of
-/// how many are earned. Badges unlock off the user's best-ever win streak, so
+/// how many are earned. Badges unlock off the user's best-ever daily streak, so
 /// this derives entirely from the passed-in [battles] — no Bloc lookup needed,
 /// which keeps it safe to push above the root provider scope.
 class MilestonesScreen extends StatelessWidget {
@@ -15,24 +16,12 @@ class MilestonesScreen extends StatelessWidget {
 
   const MilestonesScreen({super.key, required this.battles});
 
-  int get _bestStreak {
-    var best = 0, run = 0;
-    for (final b in battles) {
-      if (b.isWin) {
-        run++;
-        if (run > best) best = run;
-      } else {
-        run = 0;
-      }
-    }
-    return best;
-  }
-
   @override
   Widget build(BuildContext context) {
     final badges = evaluateStreakBadges(battles);
     final earned = badges.earnedCount;
     final total = badges.length;
+    final bestStreak = dailyBestStreak(battles);
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -61,7 +50,7 @@ class MilestonesScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Best streak: $_bestStreak ${_bestStreak == 1 ? 'win' : 'wins'}',
+                      'Best streak: $bestStreak ${bestStreak == 1 ? 'day' : 'days'}',
                       style: const TextStyle(
                         color: AppColors.textSecondary,
                         fontSize: 14,
@@ -186,9 +175,10 @@ class _HowItWorks extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           const Text(
-            'Your streak is the number of wins in a row. Reaching a milestone '
-            'unlocks its badge for good — a loss resets your streak, but the '
-            'badges you’ve earned stay yours forever.',
+            'Your streak is the number of clean days in a row — days you win at '
+            'least one battle and lose none. A day off keeps your streak frozen, '
+            'and a loss resets it. Reaching a milestone unlocks its badge for '
+            'good — the badges you’ve earned stay yours forever.',
             style: TextStyle(
               color: AppColors.textSecondary,
               fontSize: 13,
@@ -231,8 +221,8 @@ class _BadgeCell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final reqLabel = badge.requiredDays == 1
-        ? '1 win'
-        : '${badge.requiredDays} wins';
+        ? '1 day'
+        : '${badge.requiredDays} days';
     return GestureDetector(
       onTap: badge.earned
           ? () => Navigator.push(

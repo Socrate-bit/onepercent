@@ -35,7 +35,7 @@ class BattleCubit extends Cubit<BattleState> {
   Future<void> recordWin({int difficulty = 0, String name = ''}) =>
       _record(BattleOutcome.win, difficulty, name);
 
-  /// Records a loss (current streak resets on the next stream emission).
+  /// Records a loss (breaks the current day's streak on the next emission).
   Future<void> recordLoss({int difficulty = 0, String name = ''}) =>
       _record(BattleOutcome.loss, difficulty, name);
 

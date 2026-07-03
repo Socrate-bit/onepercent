@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../../theme/app_theme.dart';
 
-/// The fiery circular indicator for the current win streak shown on Home.
+/// The fiery circular indicator for the current daily streak shown on Home.
 ///
 /// Renders a glowing orange ring with the streak number and a "days" caption
 /// centered inside it.

@@ -1,13 +1,14 @@
 import '../../battle/models/battle.dart';
+import '../../battle/util/streaks.dart';
 
 /// A single progressive streak milestone. Badges unlock off the user's
-/// best-ever win streak, so once earned they are permanent — a later loss
+/// best-ever daily streak, so once earned they are permanent — a later loss
 /// never revokes one.
 class StreakBadge {
   final String id;
   final String name;
 
-  /// Consecutive wins required to unlock this badge.
+  /// Consecutive clean days required to unlock this badge.
   final int requiredDays;
 
   /// Short line shown on the unlock/detail screen.
@@ -42,7 +43,7 @@ List<StreakBadge> _defs() => [
         id: 'ember',
         name: 'Ember',
         requiredDays: 3,
-        quote: 'Three wins in. The ember glows.',
+        quote: 'Three clean days in. The ember glows.',
       ),
       StreakBadge(
         id: 'flame',
@@ -60,64 +61,63 @@ List<StreakBadge> _defs() => [
         id: 'forge',
         name: 'Forge',
         requiredDays: 30,
-        quote: 'A month of wins. You are forging a new self.',
+        quote: 'A month of clean days. You are forging a new self.',
       ),
       StreakBadge(
         id: 'inferno',
         name: 'Inferno',
-        requiredDays: 100,
-        quote: 'One hundred wins. Unstoppable.',
+        requiredDays: 60,
+        quote: 'Sixty days. Unstoppable.',
       ),
       StreakBadge(
         id: 'wildfire',
         name: 'Wildfire',
-        requiredDays: 300,
-        quote: 'Three hundred wins. Nothing contains you now.',
+        requiredDays: 100,
+        quote: 'One hundred days. Nothing contains you now.',
       ),
       StreakBadge(
         id: 'phoenix',
         name: 'Phoenix',
-        requiredDays: 1000,
-        quote: 'A thousand wins. You have risen, reborn.',
+        requiredDays: 180,
+        quote: 'Half a year. You have risen, reborn.',
       ),
       StreakBadge(
         id: 'titan',
         name: 'Titan',
-        requiredDays: 3000,
-        quote: 'Three thousand wins. The discipline of a titan.',
+        requiredDays: 365,
+        quote: 'A full year. The discipline of a titan.',
       ),
       StreakBadge(
         id: 'immortal',
         name: 'Immortal',
-        requiredDays: 10000,
-        quote: 'Ten thousand wins. Legend made flesh.',
+        requiredDays: 1000,
+        quote: 'A thousand days. Legend made flesh.',
       ),
     ];
 
 /// Builds the badge list and marks each earned/unlocked against [battles].
 ///
-/// Walks battles oldest-first tracking a running win streak (reset on loss,
-/// matching [Battle] semantics), stamping each badge's [StreakBadge.earnedDate]
-/// the moment the running streak first reaches its requirement. A badge stays
-/// earned even if the streak later breaks, because the threshold was met.
+/// Walks the per-day outcome roll-up oldest-first tracking a running daily
+/// streak (a clean day extends it, a loss day resets it, empty days are frozen
+/// — matching [dailyCurrentStreak]), stamping each badge's
+/// [StreakBadge.earnedDate] the moment the running streak first reaches its
+/// requirement. A badge stays earned even if the streak later breaks, because
+/// the threshold was met.
 List<StreakBadge> evaluateStreakBadges(List<Battle> battles) {
   final badges = _defs();
 
-  // Oldest first — Battle stream is emitted oldest-first, but sort defensively.
-  final ordered = [...battles]..sort((a, b) => a.ts.compareTo(b.ts));
-
   var run = 0;
-  for (final b in ordered) {
-    if (b.isWin) {
-      run++;
-      for (final badge in badges) {
-        if (!badge.earned && run >= badge.requiredDays) {
-          badge.earned = true;
-          badge.earnedDate = b.ts;
-        }
-      }
-    } else {
+  for (final day in dailyOutcomes(battles)) {
+    if (day.hasLoss) {
       run = 0;
+      continue;
+    }
+    run++; // clean day
+    for (final badge in badges) {
+      if (!badge.earned && run >= badge.requiredDays) {
+        badge.earned = true;
+        badge.earnedDate = day.day;
+      }
     }
   }
 
