@@ -43,6 +43,11 @@ class Battle extends Equatable {
   /// The user's personal values tagged onto this decision (empty if none).
   final List<String> values;
 
+  /// How many wins/losses this record counts for. Normal battles weigh 1; a
+  /// whole-day validation weighs 4. Weight is summed (not counted) across every
+  /// win/loss/battle metric so a validated day acts as four battles.
+  final int weight;
+
   const Battle({
     required this.id,
     required this.outcome,
@@ -51,6 +56,7 @@ class Battle extends Equatable {
     this.name = '',
     this.source = BattleSource.normal,
     this.values = const [],
+    this.weight = 1,
   });
 
   bool get isWin => outcome == BattleOutcome.win;
@@ -69,6 +75,7 @@ class Battle extends Equatable {
       name: data['name'] as String? ?? '',
       source: BattleSource.fromName(data['source'] as String?),
       values: (data['values'] as List?)?.cast<String>() ?? const [],
+      weight: (data['weight'] as num?)?.toInt() ?? 1,
     );
   }
 
@@ -80,9 +87,10 @@ class Battle extends Equatable {
         'name': name,
         'source': source.name,
         'values': values,
+        'weight': weight,
       };
 
   @override
   List<Object?> get props =>
-      [id, outcome, ts, difficulty, name, source, values];
+      [id, outcome, ts, difficulty, name, source, values, weight];
 }

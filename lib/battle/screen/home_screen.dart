@@ -131,20 +131,25 @@ class _HomeScreenState extends State<HomeScreen> {
   static const int _validateHour = 21;
 
   bool _canValidateDay(BattleState state) =>
-      DateTime.now().hour >= _validateHour && !state.validatedToday;
+      DateTime.now().hour >= _validateHour &&
+      !state.validatedToday &&
+      !state.hasLossToday;
 
   /// Reason the button is locked, or null when it's tappable.
   String? _validateLockReason(BattleState state) {
     if (state.validatedToday) return 'Already validated today';
+    if (state.hasLossToday) return 'You logged a loss today';
     if (DateTime.now().hour < _validateHour) return 'Unlocks at 9:00 PM';
     return null;
   }
 
-  /// Quick "no loss today" action: logs a win and celebrates, no dialog.
+  /// Quick "no loss today" action: logs a win worth four and celebrates, no
+  /// dialog. A validated day counts as four wins.
   void _validateDay() {
     context.read<BattleCubit>().recordWin(
           name: 'Day validated',
           source: BattleSource.validated,
+          weight: 4,
         );
     _confetti.play();
   }
