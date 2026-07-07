@@ -92,7 +92,7 @@ class BattleState extends Equatable {
   int get bestStreak => dailyBestStreak(battles);
 
   /// Lifetime total wins (not windowed) — shown on Home.
-  int get totalWinsAllTime => battles.where((b) => b.isWin).length;
+  int get totalWinsAllTime => _weight(battles.where((b) => b.isWin));
 
   /// Whether the day has already been validated today (a validated-source win
   /// logged on the current calendar day). Drives the Validate Day lock.
@@ -105,28 +105,45 @@ class BattleState extends Equatable {
         b.ts.day == now.day);
   }
 
-  // --- This week (last 7 days) --------------------------------------------
+  /// Whether any loss was logged today. A day can only be validated when it is
+  /// genuinely clean, so this blocks the Validate Day action.
+  bool get hasLossToday {
+    final now = DateTime.now();
+    return battles.any((b) =>
+        b.isLoss &&
+        b.ts.year == now.year &&
+        b.ts.month == now.month &&
+        b.ts.day == now.day);
+  }
 
-  /// Battles recorded in the last 7 days (today included).
+  /// Sum of the [weight] over [items] — the weighted count of battles.
+  static int _weight(Iterable<Battle> items) =>
+      items.fold(0, (sum, b) => sum + b.weight);
+
+  // --- This week (from Monday) --------------------------------------------
+
+  /// Battles recorded since the most recent Monday (this calendar week, today
+  /// included).
   List<Battle> get _thisWeekBattles {
-    final cutoff = _dateOnly(DateTime.now()).subtract(const Duration(days: 6));
-    return battles.where((b) => !_dateOnly(b.ts).isBefore(cutoff)).toList();
+    final today = _dateOnly(DateTime.now());
+    final monday = today.subtract(Duration(days: today.weekday - 1));
+    return battles.where((b) => !_dateOnly(b.ts).isBefore(monday)).toList();
   }
 
   /// Number of battles fought this week.
-  int get battlesThisWeek => _thisWeekBattles.length;
+  int get battlesThisWeek => _weight(_thisWeekBattles);
 
   /// Wins recorded this week.
-  int get winsThisWeek => _thisWeekBattles.where((b) => b.isWin).length;
+  int get winsThisWeek => _weight(_thisWeekBattles.where((b) => b.isWin));
 
   /// Losses recorded this week.
-  int get lossesThisWeek => _thisWeekBattles.where((b) => b.isLoss).length;
+  int get lossesThisWeek => _weight(_thisWeekBattles.where((b) => b.isLoss));
 
   /// Win rate this week as a percentage (0 when no battles this week).
   double get winRateThisWeek {
-    final week = _thisWeekBattles;
-    if (week.isEmpty) return 0;
-    return week.where((b) => b.isWin).length / week.length * 100;
+    final total = battlesThisWeek;
+    if (total == 0) return 0;
+    return winsThisWeek / total * 100;
   }
 
   // --- Windowed aggregates ------------------------------------------------
@@ -139,9 +156,9 @@ class BattleState extends Equatable {
     return battles.where((b) => !_dateOnly(b.ts).isBefore(cutoff)).toList();
   }
 
-  int get wins => windowBattles.where((b) => b.isWin).length;
-  int get losses => windowBattles.where((b) => b.isLoss).length;
-  int get battlesFought => windowBattles.length;
+  int get wins => _weight(windowBattles.where((b) => b.isWin));
+  int get losses => _weight(windowBattles.where((b) => b.isLoss));
+  int get battlesFought => _weight(windowBattles);
 
   /// Win rate as a percentage (0 when no battles in window).
   double get winRate =>
@@ -160,9 +177,9 @@ class BattleState extends Equatable {
       final day = _dateOnly(b.ts);
       final entry = map.putIfAbsent(day, () => [0, 0]);
       if (b.isWin) {
-        entry[0]++;
+        entry[0] += b.weight;
       } else {
-        entry[1]++;
+        entry[1] += b.weight;
       }
     }
     final days = map.keys.toList()..sort();
@@ -171,15 +188,38 @@ class BattleState extends Equatable {
         .toList();
   }
 
-  /// Cumulative wins/losses over the window, one point per active day.
+  /// Cumulative wins/losses over the window. Points are aggregated per day for
+  /// the short ranges, weekly for [StatsRange.last90], and monthly for
+  /// [StatsRange.all] so the chart stays legible over long spans.
   List<SeriesPoint> get cumulativeSeries {
+    final buckets = <DateTime, List<int>>{}; // bucketStart -> [wins, losses]
+    for (final t in dayTallies) {
+      final key = _bucketStart(t.day);
+      final entry = buckets.putIfAbsent(key, () => [0, 0]);
+      entry[0] += t.wins;
+      entry[1] += t.losses;
+    }
+    final keys = buckets.keys.toList()..sort();
     var wins = 0;
     var losses = 0;
-    return dayTallies.map((t) {
-      wins += t.wins;
-      losses += t.losses;
-      return SeriesPoint(day: t.day, cumulativeWins: wins, cumulativeLosses: losses);
+    return keys.map((k) {
+      wins += buckets[k]![0];
+      losses += buckets[k]![1];
+      return SeriesPoint(day: k, cumulativeWins: wins, cumulativeLosses: losses);
     }).toList();
+  }
+
+  /// The bucket a [day] falls into for [cumulativeSeries], per the active range:
+  /// weekly (Monday) for 90 days, monthly for all-time, daily otherwise.
+  DateTime _bucketStart(DateTime day) {
+    switch (range) {
+      case StatsRange.last90:
+        return day.subtract(Duration(days: day.weekday - 1));
+      case StatsRange.all:
+        return DateTime(day.year, day.month, 1);
+      default:
+        return day;
+    }
   }
 
   static DateTime _dateOnly(DateTime d) => DateTime(d.year, d.month, d.day);

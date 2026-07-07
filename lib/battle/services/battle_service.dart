@@ -30,6 +30,7 @@ class BattleService {
     String name = '',
     BattleSource source = BattleSource.normal,
     List<String> values = const [],
+    int weight = 1,
   }) async {
     try {
       final battle = Battle(
@@ -40,6 +41,7 @@ class BattleService {
         name: name,
         source: source,
         values: values,
+        weight: weight,
       );
       await _battles(uid).add(battle.toMap());
       debugPrint('[BattleService] Recorded ${outcome.name} for $uid');

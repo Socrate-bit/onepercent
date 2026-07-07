@@ -46,26 +46,23 @@ class ValueScreen extends StatelessWidget {
               ..showSnackBar(SnackBar(content: Text(state.error!)));
           },
           builder: (context, state) {
-            return CustomScrollView(
-              slivers: [
-                SliverPadding(
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Padding(
                   padding: EdgeInsets.fromLTRB(20.w, 8.h, 20.w, 16.h),
-                  sliver: const SliverToBoxAdapter(child: _Header()),
+                  child: const _Header(),
                 ),
                 if (state.loading && state.values.isEmpty)
-                  const SliverFillRemaining(
-                    hasScrollBody: false,
+                  const Expanded(
                     child: Center(child: CircularProgressIndicator()),
                   )
                 else if (state.values.isEmpty)
-                  const SliverFillRemaining(
-                    hasScrollBody: false,
-                    child: _EmptyState(),
-                  )
+                  const Expanded(child: Center(child: _EmptyState()))
                 else
-                  SliverPadding(
-                    padding: EdgeInsets.fromLTRB(20.w, 0, 20.w, 96.h),
-                    sliver: SliverReorderableList(
+                  Expanded(
+                    child: ReorderableListView.builder(
+                      padding: EdgeInsets.fromLTRB(20.w, 0, 20.w, 96.h),
                       itemCount: state.values.length,
                       onReorder: (oldIndex, newIndex) =>
                           context.read<ValueCubit>().reorder(oldIndex, newIndex),
