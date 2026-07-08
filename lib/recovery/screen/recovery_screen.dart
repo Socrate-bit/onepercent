@@ -80,6 +80,7 @@ class _RecoveryScreenState extends State<RecoveryScreen> {
       name: entry.name,
       source: BattleSource.recovery,
       values: entry.values,
+      socialExpansion: entry.socialExpansion,
     );
     _confetti.play();
     await recovery.clearTasks();

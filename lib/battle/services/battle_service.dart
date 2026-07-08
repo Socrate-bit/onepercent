@@ -30,6 +30,7 @@ class BattleService {
     String name = '',
     BattleSource source = BattleSource.normal,
     List<String> values = const [],
+    bool socialExpansion = false,
     int weight = 1,
   }) async {
     try {
@@ -41,6 +42,7 @@ class BattleService {
         name: name,
         source: source,
         values: values,
+        socialExpansion: socialExpansion,
         weight: weight,
       );
       await _battles(uid).add(battle.toMap());

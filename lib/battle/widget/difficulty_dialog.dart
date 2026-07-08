@@ -12,6 +12,7 @@ typedef DifficultyResult = ({
   int difficulty,
   String name,
   List<String> values,
+  bool socialExpansion,
   bool breathe,
   bool recover,
 });
@@ -59,6 +60,7 @@ class _DifficultySheetState extends State<_DifficultySheet> {
   double _value = 5;
   final _nameController = TextEditingController();
   final Set<String> _selectedValues = {};
+  bool _socialExpansion = false;
 
   /// Mutable copy of the offered values so a freshly-added one shows instantly.
   late final List<String> _values = [...widget.values];
@@ -75,6 +77,7 @@ class _DifficultySheetState extends State<_DifficultySheet> {
         difficulty: _value.round(),
         name: _nameController.text.trim(),
         values: _selectedValues.toList(),
+        socialExpansion: _socialExpansion,
         breathe: breathe,
         recover: recover,
       ),
@@ -127,6 +130,67 @@ class _DifficultySheetState extends State<_DifficultySheet> {
           ],
         ),
       ],
+    );
+  }
+
+  /// A tappable card tagging the decision as a "social expansion" — putting
+  /// yourself out there socially. Available on both wins and losses.
+  Widget _socialExpansionToggle() {
+    const accent = AppColors.social;
+    final selected = _socialExpansion;
+    return Material(
+      color: selected ? accent.withValues(alpha: 0.14) : AppColors.background,
+      borderRadius: BorderRadius.circular(16.r),
+      child: InkWell(
+        onTap: () => setState(() => _socialExpansion = !_socialExpansion),
+        borderRadius: BorderRadius.circular(16.r),
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16.r),
+            border: Border.all(
+              color: selected ? accent : AppColors.cardBorder,
+            ),
+          ),
+          child: Row(
+            children: [
+              Icon(Icons.groups_rounded, color: accent, size: 22.r),
+              SizedBox(width: 12.w),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Social expansion',
+                      style: TextStyle(
+                        color: AppColors.textPrimary,
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    SizedBox(height: 2.h),
+                    Text(
+                      'You put yourself out there socially',
+                      style: TextStyle(
+                        color: AppColors.textSecondary,
+                        fontSize: 12.sp,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(width: 10.w),
+              Icon(
+                selected
+                    ? Icons.check_circle_rounded
+                    : Icons.radio_button_unchecked_rounded,
+                color: selected ? accent : AppColors.textSecondary,
+                size: 22.r,
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
@@ -184,6 +248,11 @@ class _DifficultySheetState extends State<_DifficultySheet> {
     return SafeArea(
       top: false,
       child: Container(
+        // Cap the sheet height so tall content (values, social tag, loss
+        // reflection) scrolls instead of overflowing the screen.
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(context).size.height * 0.9,
+        ),
         padding: EdgeInsets.fromLTRB(
           24.w,
           12.h,
@@ -195,10 +264,11 @@ class _DifficultySheetState extends State<_DifficultySheet> {
           border: const Border(top: BorderSide(color: AppColors.cardBorder)),
           borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
             // Grab handle.
             Center(
               child: Container(
@@ -293,6 +363,8 @@ class _DifficultySheetState extends State<_DifficultySheet> {
               SizedBox(height: 18.h),
               _valuePicker(accent),
             ],
+            SizedBox(height: 18.h),
+            _socialExpansionToggle(),
             if (!isWin) ...[
               SizedBox(height: 20.h),
               _reflection(accent),
@@ -333,6 +405,7 @@ class _DifficultySheetState extends State<_DifficultySheet> {
               ],
             ),
           ],
+          ),
         ),
       ),
     );

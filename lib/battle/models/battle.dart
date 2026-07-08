@@ -43,6 +43,10 @@ class Battle extends Equatable {
   /// The user's personal values tagged onto this decision (empty if none).
   final List<String> values;
 
+  /// Whether this decision was tagged as a "social expansion" — putting
+  /// oneself out there socially. Available on both wins and losses.
+  final bool socialExpansion;
+
   /// How many wins/losses this record counts for. Normal battles weigh 1; a
   /// whole-day validation weighs 4. Weight is summed (not counted) across every
   /// win/loss/battle metric so a validated day acts as four battles.
@@ -56,6 +60,7 @@ class Battle extends Equatable {
     this.name = '',
     this.source = BattleSource.normal,
     this.values = const [],
+    this.socialExpansion = false,
     this.weight = 1,
   });
 
@@ -75,6 +80,7 @@ class Battle extends Equatable {
       name: data['name'] as String? ?? '',
       source: BattleSource.fromName(data['source'] as String?),
       values: (data['values'] as List?)?.cast<String>() ?? const [],
+      socialExpansion: data['socialExpansion'] as bool? ?? false,
       weight: (data['weight'] as num?)?.toInt() ?? 1,
     );
   }
@@ -87,10 +93,11 @@ class Battle extends Equatable {
         'name': name,
         'source': source.name,
         'values': values,
+        'socialExpansion': socialExpansion,
         'weight': weight,
       };
 
   @override
   List<Object?> get props =>
-      [id, outcome, ts, difficulty, name, source, values, weight];
+      [id, outcome, ts, difficulty, name, source, values, socialExpansion, weight];
 }

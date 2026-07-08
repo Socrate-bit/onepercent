@@ -86,11 +86,17 @@ class _HomeScreenState extends State<HomeScreen> {
 
     if (outcome == BattleOutcome.win) {
       cubit.recordWin(
-          difficulty: entry.difficulty, name: entry.name, values: entry.values);
+          difficulty: entry.difficulty,
+          name: entry.name,
+          values: entry.values,
+          socialExpansion: entry.socialExpansion);
       _confetti.play();
     } else {
       cubit.recordLoss(
-          difficulty: entry.difficulty, name: entry.name, values: entry.values);
+          difficulty: entry.difficulty,
+          name: entry.name,
+          values: entry.values,
+          socialExpansion: entry.socialExpansion);
       if (entry.breathe && mounted) {
         await _startBreathing(context);
       } else if (entry.recover && mounted) {
