@@ -194,7 +194,10 @@ class _BattleRow extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
+                Wrap(
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  spacing: 8.w,
+                  runSpacing: 6.h,
                   children: [
                     Text(
                       isWin ? 'WIN' : 'LOSS',
@@ -205,10 +208,9 @@ class _BattleRow extends StatelessWidget {
                         letterSpacing: 1.sp,
                       ),
                     ),
-                    if (battle.source != BattleSource.normal) ...[
-                      SizedBox(width: 8.w),
-                      Flexible(child: _SourceChip(source: battle.source)),
-                    ],
+                    if (battle.source != BattleSource.normal)
+                      _SourceChip(source: battle.source),
+                    if (battle.socialExpansion) const _SocialExpansionChip(),
                   ],
                 ),
                 SizedBox(height: 2.h),
@@ -301,6 +303,38 @@ class _SourceChip extends StatelessWidget {
             badge.label,
             style: TextStyle(
               color: AppColors.win,
+              fontSize: 11.sp,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// A small pill marking a battle tagged as a "social expansion".
+class _SocialExpansionChip extends StatelessWidget {
+  const _SocialExpansionChip();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+      decoration: BoxDecoration(
+        color: AppColors.social.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(8.r),
+        border: Border.all(color: AppColors.social.withValues(alpha: 0.35)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.groups_rounded, color: AppColors.social, size: 13.r),
+          SizedBox(width: 5.w),
+          Text(
+            'Social expansion',
+            style: TextStyle(
+              color: AppColors.social,
               fontSize: 11.sp,
               fontWeight: FontWeight.w700,
             ),

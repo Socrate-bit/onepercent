@@ -135,6 +135,24 @@ class HistoryDetailScreen extends StatelessWidget {
                   ),
                 ),
               ],
+              if (battle.socialExpansion) ...[
+                SizedBox(height: 12.h),
+                _InfoTile(
+                  icon: Icons.groups_rounded,
+                  label: 'SOCIAL EXPANSION',
+                  child: Padding(
+                    padding: EdgeInsets.only(top: 2.h),
+                    child: Text(
+                      'You put yourself out there socially.',
+                      style: TextStyle(
+                        color: AppColors.social,
+                        fontSize: 15.sp,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
               SizedBox(height: 12.h),
               _InfoTile(
                 icon: Icons.notes_rounded,

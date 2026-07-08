@@ -15,6 +15,7 @@ class AppColors {
   static const Color fire = Color(0xFFFF7A1A); // streak / accent orange
   static const Color win = Color(0xFF22C55E); // green
   static const Color loss = Color(0xFFEF4444); // red
+  static const Color social = Color(0xFF8B5CF6); // violet — social expansion
 
   static const Color textPrimary = Color(0xFFF2F5F8);
   static const Color textSecondary = Color(0xFF8B95A1);
